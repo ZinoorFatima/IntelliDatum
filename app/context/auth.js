@@ -17,6 +17,7 @@ const AuthProvider = ({ children }) => {
 
     if (typeof window !== "undefined") {
       const data = localStorage.getItem("auth");
+      console.log("local data:" , data)
       if (data) {
         const parsedData = JSON.parse(data);
         setAuth({

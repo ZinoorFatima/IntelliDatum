@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '../context/auth';
+import toast from 'react-hot-toast';
 const Signin = () => {
     const router = useRouter();
     const [email, setEmail] = useState("");
@@ -29,13 +30,13 @@ const Signin = () => {
           const result = await res.json();
           if (res.ok) {
             console.log("Login successful:", result);
-            router.push("/");
             setAuth({
               ...auth,
-              user:res.data.user,
-              token:res.data.token,
+              user:result.user,
+              token:result.token,
             });
-            localStorage.setItem('auth',JSON.stringify(res.data));
+            console.log(result.user)
+            localStorage.setItem("auth", JSON.stringify({ user: result.user, token: result.token }));
           } else {
             console.error("Login failed:", result);
             alert(result.message || "Login failed");

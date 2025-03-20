@@ -77,7 +77,7 @@ const Header = () => {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  {auth?.user?.Firstname}
+                  {auth?.user?.FirstName}
                 </Link>
                 <ul className="dropdown-menu">
                   <li>

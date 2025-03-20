@@ -115,7 +115,7 @@ export const registerController = async (req) => {
   
       // Generate JWT token
       const token = await JWT.sign({ _id: user.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-  
+      console.log("user login: ", user )
       return new Response(
         JSON.stringify({
           success: true,

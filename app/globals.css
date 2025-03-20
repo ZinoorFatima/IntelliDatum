@@ -12,6 +12,10 @@ code {
     monospace;
 }
 
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
 
 
 .navbar{
