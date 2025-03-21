@@ -28,7 +28,7 @@ const Page = () => {
 
       // Send file content to API
       try {
-        const response = await fetch("http://54.83.150.182:5000/process", {
+        const response = await fetch("https://cors-anywhere.herokuapp.com/http://54.83.150.182:5000/process", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: fileText }),
