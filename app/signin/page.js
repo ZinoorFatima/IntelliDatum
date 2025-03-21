@@ -28,6 +28,8 @@ const Signin = () => {
             body: JSON.stringify(data),
           });
           const result = await res.json();
+
+          console.log(result, "RES: ", res.ok)
           if (res.ok) {
             console.log("Login successful:", result);
             setAuth({
@@ -37,6 +39,7 @@ const Signin = () => {
             });
             console.log(result.user)
             localStorage.setItem("auth", JSON.stringify({ user: result.user, token: result.token }));
+            router.push("/");
           } else {
             console.error("Login failed:", result);
             alert(result.message || "Login failed");

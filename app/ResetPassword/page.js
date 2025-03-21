@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import axios from "axios";
-import { toast } from "react-toastify";
 
 const ResetPassword = () => {
   const router = useRouter();
