@@ -8,7 +8,7 @@ import Link from "next/link";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  const router = useRouter();
+  //const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

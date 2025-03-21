@@ -3,13 +3,13 @@ import React from 'react'
 import { useState } from 'react';
 
 
-const page = () => {
+const UserDetails = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileDetails, setFileDetails] = useState(null);
-    const [FirstName,setFirstName] = useState('')
-    const [LastName, setLastName] = useState('')
-    const [email, setEmail] = useState('')
-  const handleFileChange = (event) => {
+    //const [FirstName,setFirstName] = useState('')
+    //const [LastName, setLastName] = useState('')
+    //const [email, setEmail] = useState('')
+ /* const handleFileChange = (event) => {
     const file = event.target.files[0]; // Get the first selected file
     setSelectedFile(file);
   };
@@ -23,7 +23,7 @@ const page = () => {
         status: 'Processing...',
       });
     }
-  };
+  };*/
 
   return (
     <div style={{display:'flex', flexDirection: 'column',alignItems: 'center',}}>
@@ -49,13 +49,13 @@ const page = () => {
 
             <div class = 'col-9'style={{ padding: '20px' ,display:'flex', flexDirection: 'column'}}>
                 <div class = 'row mb-5' >
-                    FirstName : Sarah {FirstName}
+                    FirstName : Sarah 
                 </div>
                 <div class = 'row mb-5'>
-                    LastName : Ali {LastName}
+                    LastName : Ali
                 </div>
                 <div class = 'row '>
-                    Email : saraAli@nu.edu.pk {email}
+                    Email : saraAli@nu.edu.pk 
                 </div>
                 
             </div>
@@ -113,4 +113,4 @@ const page = () => {
   )
 }
 
-export default page
+export default UserDetails

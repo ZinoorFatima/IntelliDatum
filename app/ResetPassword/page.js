@@ -10,8 +10,8 @@ const ResetPassword = () => {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
-  const userId = searchParams.get("id");
-  const token = searchParams.get("token");
+  //const userId = searchParams.get("id");
+  //const token = searchParams.get("token");
 
   const handleSubmit = async (e) => {
     e.preventDefault();

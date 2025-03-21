@@ -145,7 +145,7 @@ const Signin = () => {
               gap: '5px',
             }}
           >
-            <div >Don't have an account?</div>
+            <div >Do not have an account?</div>
             <Link href="/signup"style={{
               color:'black'
             }}>Register</Link>

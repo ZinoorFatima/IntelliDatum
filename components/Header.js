@@ -9,7 +9,7 @@ const Header = () => {
 
   // Ensure Bootstrap JavaScript is loaded
   useEffect(() => {
-    require("bootstrap/dist/js/bootstrap.bundle.min.js");
+    import("bootstrap/dist/js/bootstrap.bundle.min.js");
   }, []);
 
   const handleLogout = () => {
