@@ -193,8 +193,7 @@ export const ForgotPasswordController = async (req, res) => {
   };
 
   //reset password controller
-// RESET PASSWORD CONTROLLER
-export const ResetPasswordController = async (req) => {
+  export const ResetPasswordController = async (req) => {
     try {
       const { password, token, userId } = await req.json();
       const userToken = await resetTokenModel.findOne({ user_id: userId })
@@ -202,15 +201,33 @@ export const ResetPasswordController = async (req) => {
         .limit(1);
   
       if (!userToken) {
-        return { success: false, message: "Some problem occurred!", status: 400 };
+        return new Response(
+          JSON.stringify({ success: false, message: "Some problem occurred!" }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
   
       if (new Date() > new Date(userToken.expires_at)) {
-        return { success: false, message: "Reset Password link has expired!", status: 400 };
+        return new Response(
+          JSON.stringify({ success: false, message: "Reset Password link has expired!" }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
   
       if (userToken.token !== token) {
-        return { success: false, message: "Reset Password link is invalid!", status: 400 };
+        return new Response(
+          JSON.stringify({ success: false, message: "Reset Password link is invalid!" }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
   
       await resetTokenModel.deleteMany({ user_id: userId });
@@ -219,13 +236,25 @@ export const ResetPasswordController = async (req) => {
       const hashedPassword = await bcrypt.hash(password, salt);
       await userModel.findByIdAndUpdate(userId, { password: hashedPassword });
   
-      return { success: true, message: "Your password was reset successfully!" };
-  
+      return new Response(
+        JSON.stringify({ success: true, message: "Your password was reset successfully!" }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     } catch (err) {
       console.error(err);
-      return { success: false, message: "Server Error", status: 500 };
+      return new Response(
+        JSON.stringify({ success: false, message: "Internal Server Error" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
   };
+  
   
   // UPDATE PROFILE CONTROLLER
   export const UpdateProfileController = async (req) => {

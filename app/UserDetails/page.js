@@ -1,11 +1,11 @@
 "use client"
 import React from 'react'
-import { useState } from 'react';
+//import { useState } from 'react';
 
 
 const UserDetails = () => {
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [fileDetails, setFileDetails] = useState(null);
+    //const [selectedFile, setSelectedFile] = useState(null);
+    //const [fileDetails, setFileDetails] = useState(null);
     //const [FirstName,setFirstName] = useState('')
     //const [LastName, setLastName] = useState('')
     //const [email, setEmail] = useState('')
@@ -90,7 +90,7 @@ const UserDetails = () => {
               <div style={{ width: '30%' }}>File Size</div>
               <div style={{ width: '30%' }}>Status</div>
             </div>
-            {fileDetails && (
+            {/*fileDetails && (
               <div
                 style={{
                   display: 'flex',
@@ -102,7 +102,7 @@ const UserDetails = () => {
                 <div style={{ width: '30%' }}>{fileDetails.size}</div>
                 <div style={{ width: '30%' }}>{fileDetails.status}</div>
               </div>
-            )}
+            )*/}
           </div>
                 
             </div>
