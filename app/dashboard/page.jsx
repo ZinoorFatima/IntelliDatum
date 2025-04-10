@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 export default function DashboardPage() {
-  const [files, setFiles] = useState([
+  const [files] = useState([
     {
       id: 1,
       name: 'invoice_data.json',
