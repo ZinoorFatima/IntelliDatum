@@ -34,7 +34,7 @@ const SignUp = () => {
         },
         body: JSON.stringify(data),
       });
-      console.log("Works",res)
+      //console.log("Works",res)
       //router.push("/signin"); 
       
       if (res.ok) {

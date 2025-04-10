@@ -1,27 +1,13 @@
-//import { registerController } from "../../../../controllers/authcontroller"; // Adjust path as needed
+import { registerController } from "../../../../controllers/authcontroller";
 import { connectDB } from "../../../lib/db";
 export async function POST(req) {
-    
-    console.log("Register request body:", req); // Check Amplify logs
-    console.log("MONGODB_URI in api :", process.env.MONGODB_URI); // Debug logging
-
-    await connectDB();
-    return new Response(
-        JSON.stringify({
-          success: true,
-          message: "API CALLED",
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      );
-    /*try {
+    try {
         await connectDB();
         console.log("hejrhe")
         return registerController(req);
-        //res.status(200).json({ success: true });
     } catch (error) {
-        console.error("Registration error:", error);
-        //res.status(500).json({ error: error.message });
-    }*/
+        console.error("Registration error from api:", error);
+    }
 }
 
 export async function GET() {
