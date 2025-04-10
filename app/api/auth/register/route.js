@@ -1,9 +1,16 @@
-import { registerController } from "../../../../controllers/authcontroller"; // Adjust path as needed
-import { connectDB } from "../../../lib/db";
+//import { registerController } from "../../../../controllers/authcontroller"; // Adjust path as needed
+//import { connectDB } from "../../../lib/db";
 export async function POST(req) {
     
-    console.log("Register request body:", req.body); // Check Amplify logs
-    try {
+    console.log("Register request body:", req); // Check Amplify logs
+    return new Response(
+        JSON.stringify({
+          success: true,
+          message: "API CALLED",
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    /*try {
         await connectDB();
         console.log("hejrhe")
         return registerController(req);
@@ -11,7 +18,7 @@ export async function POST(req) {
     } catch (error) {
         console.error("Registration error:", error);
         //res.status(500).json({ error: error.message });
-    }
+    }*/
 }
 
 export async function GET() {

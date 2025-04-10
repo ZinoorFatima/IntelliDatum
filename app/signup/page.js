@@ -35,15 +35,15 @@ const SignUp = () => {
         body: JSON.stringify(data),
       });
       console.log("Works",res)
-      router.push("/signin"); 
-      //const result = await res.json();
-      //if (res.ok) {
-      //  console.log("Signup successful:", result);
-      //  router.push("/signin");
-      //} else {
-      //  console.error("Signup failed:", result);
-      //  alert(result.message || "Signup failed");
-      //}
+      //router.push("/signin"); 
+      
+      if (res.ok) {
+        console.log("Signup successful:", res);
+        router.push("/signin");
+      } else {
+        console.error("Signup failed:", res);
+        alert("Signup failed");
+      }
     } catch (error) {
       console.error("Error during signup:", error);
       toast("Error during signup");
