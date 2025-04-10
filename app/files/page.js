@@ -57,10 +57,10 @@ const Page = () => {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", backgroundColor: "#f8f9fa" }}>
       <div
         style={{
-          backgroundColor: "#C0D7BA",
+          backgroundColor: "#198754",
           marginTop: "5%",
           width: "80%",
           height: "50px",
@@ -68,7 +68,7 @@ const Page = () => {
           borderRadius: "10px",
         }}
       >
-        <h3 style={{ color: "#484848" }}>Upload File</h3>
+        <h3 style={{ color: "#f8f9fa" }}>Upload File</h3>
       </div>
 
       <div
@@ -89,8 +89,9 @@ const Page = () => {
               style={{
                 padding: "10px",
                 cursor: "pointer",
-                backgroundColor: "#C0D7BA",
+                backgroundColor: "#198754",
                 borderRadius: "10px",
+                color: "#f8f9fa",
               }}
             >
               Submit

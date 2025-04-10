@@ -55,21 +55,21 @@ export default function ContactUs() {
   };
 
   return (
-    <main className="position-relative d-flex min-vh-100 bg-light align-items-center justify-content-center p-4">
+    <main className="position-relative d-flex min-vh-100 bg-light align-items-center justify-content-center p-4 bg-light">
       <div className="container d-flex flex-column flex-md-row justify-content-center align-items-start gap-5 position-relative">
         
         {/* Left Text Section */}
         <div className="d-flex flex-column justify-content-center text-start w-100" style={{ maxWidth: '400px', minHeight: '430px' }}>
           <div>
-            <h1 className="display-4 fw-bold mb-3" style={{ color: '#484848' }}>Contact Us</h1>
-            <p className="fs-5" style={{ color: '#484848', lineHeight: '1.6' }}>
+            <h1 className="display-4 fw-bold mb-3 text-success">Contact Us</h1>
+            <p className="fs-5 text-success" style={{ lineHeight: '1.6' }}>
               Feel free to reach out to us through the form below.
             </p>
           </div>
         </div>
 
         {/* Form Section */}
-        <div className="position-relative d-flex justify-content-center w-100">
+        <div className="position-relative d-flex justify-content-center w-100 ">
           <img
             src="/speech-bubble.png"
             alt="Speech Bubble"
@@ -83,7 +83,7 @@ export default function ContactUs() {
             }}
           />
           <div
-            className="card p-4 shadow-lg position-relative"
+            className="card p-4 shadow-lg position-relative bg-success"
             style={{
               width: "100%",
               maxWidth: "450px",
@@ -96,7 +96,7 @@ export default function ContactUs() {
               marginRight: '-120px',
             }}
           >
-            <form className="d-grid gap-4 mt-2" onSubmit={handleSubmit}>
+            <form className="d-grid gap-4 mt-2 bg-success" onSubmit={handleSubmit}>
               <div className="mx-auto" style={{ maxWidth: "90%", width: "100%" }}>
                 <label htmlFor="name" className="form-label fw-medium" style={{ color: '#484848' }}>
                   Name
@@ -162,7 +162,7 @@ export default function ContactUs() {
               <div className="text-center">
                 <button
                   type="submit"
-                  className="btn btn-dark mt-2 py-2 px-4 fw-medium shadow"
+                  className="btn btn-light mt-2 py-2 px-4 fw-medium shadow"
                   style={{
                     borderRadius: '8px',
                     fontSize: '1.1rem',

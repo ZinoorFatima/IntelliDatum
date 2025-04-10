@@ -77,7 +77,7 @@ const ForgotPassword = () => {
   return (
     <div className="d-flex flex-column min-vh-100"
       style={{
-        backgroundColor: "#A0D49D",
+        backgroundColor: "#198754",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -117,7 +117,7 @@ const ForgotPassword = () => {
           style={{
             width: "80%",
             padding: "10px",
-            backgroundColor: "#7BC28A",
+            backgroundColor: "#198754",
             color: "white",
             border: "none",
             borderRadius: "30px",

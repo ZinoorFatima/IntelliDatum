@@ -18,7 +18,7 @@ const Header = () => {
   }, [auth]);
 
   const handleImageError = () => {
-    setProfileImage("/default-profile.png"); // fallback if fetch fails
+    setProfileImage("/images/default-profile.jpg"); // fallback if fetch fails
   };
 
   const handleLogout = () => {

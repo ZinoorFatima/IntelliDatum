@@ -55,11 +55,11 @@ export default function EditProfile() {
   };
 
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="d-flex flex-column min-vh-100 bg-success">
       <main className="container py-5 flex-grow-1">
         <div className="row justify-content-center">
           <div className="col-md-6">
-            <div className="card shadow-sm border-0">
+            <div className="card shadow-sm border-0 bg-light">
               <div className="card-body p-5">
                 <h2 className="mb-4 text-center">Edit Profile</h2>
                 <form onSubmit={handleSubmit}>

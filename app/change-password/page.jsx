@@ -51,10 +51,10 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="d-flex flex-column min-vh-100 bg-success">
       <main className="container py-5 flex-grow-1 d-flex align-items-center justify-content-center">
         <div className="col-md-6">
-          <div className="card shadow-sm border-0">
+          <div className="card shadow-sm border-0 bg-light ">
             <div className="card-body p-5">
               <h2 className="text-center mb-4">Change Password</h2>
 
