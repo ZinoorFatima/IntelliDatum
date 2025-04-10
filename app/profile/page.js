@@ -38,23 +38,23 @@ const UserDetails = () => {
             </h3>
         </div>
             
-        <div class = "row"
+        <div className = "row"
         style={{backgroundColor:'#fff',width:'80%',
             height:'100%', border:'1px', border: '2px solid #000',
             marginTop:'20px', borderRadius:'10px' }}
         >
-            <div class='col-3'>
+            <div className='col-3'>
                 <img src='User.png' style={{height:'200px', width:'200px'}} className="card-img-top" alt="..." />
             </div>      
 
-            <div class = 'col-9'style={{ padding: '20px' ,display:'flex', flexDirection: 'column'}}>
-                <div class = 'row mb-5' >
+            <div className = 'col-9'style={{ padding: '20px' ,display:'flex', flexDirection: 'column'}}>
+                <div className = 'row mb-5' >
                     FirstName : Sarah 
                 </div>
-                <div class = 'row mb-5'>
+                <div className = 'row mb-5'>
                     LastName : Ali
                 </div>
-                <div class = 'row '>
+                <div className = 'row '>
                     Email : saraAli@nu.edu.pk 
                 </div>
                 

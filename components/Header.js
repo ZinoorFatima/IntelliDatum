@@ -1,4 +1,5 @@
 "use client"; // Required in Next.js App Router
+// /dashboard/${auth?.user?.role === 1 ? "admin" : "user"}
 
 import Link from "next/link";
 import Image from "next/image";
@@ -56,7 +57,7 @@ const Header = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link href="/contact" className="nav-link">
+              <Link href="/contactus" className="nav-link">
                 Contact
               </Link>
             </li>
@@ -82,7 +83,15 @@ const Header = () => {
                 <ul className="dropdown-menu">
                   <li>
                     <Link
-                      href={`/Dashboard/${auth?.user?.role === 1 ? "admin" : "user"}`}
+                      href={`/profile`}
+                      className="dropdown-item"
+                    >
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href={`/dashboard`} 
                       className="dropdown-item"
                     >
                       Dashboard
