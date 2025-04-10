@@ -3,6 +3,8 @@ import { connectDB } from "../../../lib/db";
 export async function POST(req) {
     
     console.log("Register request body:", req); // Check Amplify logs
+    console.log("MONGODB_URI in api :", process.env.MONGODB_URI); // Debug logging
+
     await connectDB();
     return new Response(
         JSON.stringify({

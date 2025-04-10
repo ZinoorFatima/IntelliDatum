@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+console.log("MONGODB_URI:", process.env.MONGODB_URI); // Debug logging
+
 if (!process.env.MONGODB_URI) {
   throw new Error("MONGODB_URI is not defined in environment variables");
 }
