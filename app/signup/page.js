@@ -13,9 +13,67 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // 👁 Toggle
+
+
+
+  const validateForm = () => {
+    if (!firstName.trim()) {
+      alert("First name cannot be empty.");
+      return false;
+    }
+
+    if (!lastName.trim()) {
+      alert("Last name cannot be empty.");
+      return false;
+    }
+
+    if (!email.trim()) {
+      alert("Email is required.");
+      return false;
+    }
+
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.");
+      return false;
+    }
+
+    if (!phone.trim()) {
+      alert("Phone number is required.");
+      return false;
+    }
+
+    const phoneRegex = /^\d{11}$/;
+    if (!phoneRegex.test(phone)) {
+      alert("Phone number must be exactly 11 digits.");
+      return false;
+    }
+
+    if (!password) {
+      alert("Password is required.");
+      return false;
+    }
+
+    const passwordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&#^])[A-Za-z\d@$!%?&#^]{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      alert(
+        "Password must be at least 8 characters long and include:\n- One uppercase letter\n- One lowercase letter\n- One number\n- One special character"
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+ 
 
   const handleNavigation = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
 
     const data = {
       FirstName: firstName,
@@ -54,7 +112,7 @@ const SignUp = () => {
     
     <div
     style={{
-      backgroundColor: '#A0D49D',
+      backgroundColor: '#198754',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -65,7 +123,7 @@ const SignUp = () => {
           maxWidth: '80%',
           width: '100%',display: 'flex', margin:'20px auto'}}>
 
-        <div style={{ width: '30%', backgroundColor: '#f0f0f0' ,borderBottomLeftRadius:'20px',}}>
+        <div style={{ width: '30%', backgroundColor: '#f0f0f0' ,borderBottomLeftRadius:'20px', borderTopLeftRadius: '20px',}}>
         <Image
                     src="/MistyHills.png"  
                     alt="Logo 1"
@@ -76,6 +134,7 @@ const SignUp = () => {
                       height: '100%', 
                       objectFit: 'cover' ,
                       borderBottomLeftRadius:'20px',
+                      borderTopLeftRadius: '20px',
                     }} 
                   />
           </div>
@@ -86,6 +145,7 @@ const SignUp = () => {
             padding: '6%',
             border: '1px solid #ccc',
             borderBottomRightRadius:'20px',
+            borderTopRightRadius: '20px',
             
             backgroundColor: '#E5E9D2',
             display: 'flex',
@@ -159,22 +219,36 @@ const SignUp = () => {
               required
             />
           </div>
-          {/* Password Input */}
-          <div style={{ marginBottom: '5%', width: '100%', textAlign: 'center' }}>
+           {/* Password with Eye */}
+           <div style={{ marginBottom: "5%", width: "100%", textAlign: "center", position: "relative" }}>
             <input
-              type="password"
-              id="password"
-              name="password"
-              value ={password} onChange={(e) => setPassword(e.target.value)}
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               style={{
-                width: '80%', // Adjust to desired width
-                padding: '8px',
-                boxSizing: 'border-box',
+                width: "80%",
+                padding: "8px",
+                paddingRight: "40px",
+                boxSizing: "border-box",
               }}
               placeholder="Password"
               required
             />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "12%",
+                top: "50%",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                fontSize: "18px",
+              }}
+            >
+              {showPassword ? "🙈" : "👁"}
+            </span>
           </div>
+
           
 
           <button
@@ -183,7 +257,7 @@ const SignUp = () => {
             style={{
               width: '80%',
               padding: '10px',
-              backgroundColor: '#7BC28A',
+              backgroundColor: '#198754',
               color: 'white',
               border: 'none',
               borderRadius: '30px',

@@ -1,5 +1,6 @@
 import { comparePassword, hashPassword } from "../helpers/authhelper.js";
 import userModel from "../models/usermodel.js";
+import resetToken from "../models/resetTokenModel.js";
 import JWT from 'jsonwebtoken'
 import resetTokenModel from "../models/resetTokenModel.js";
 import { sendEmail,mailTemplate } from "../helpers/email.js";
@@ -7,46 +8,60 @@ const NumSaltRounds = Number(process.env.NO_OF_SALT_ROUNDS);
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import {toast} from "react-hot-toast";
+import path from "path";
+import fs from "fs";
+
 
 //register controller
 export const registerController = async (req) => {
-    try {
-      console.log("Register API called");
-  
-      // Parse request body
-      const { FirstName, LastName, email, password, phone } = await req.json();
-  
-      // Validation checks
-      if (!FirstName) return new Response(JSON.stringify({ message: "First name is required" }), { status: 400 });
-      if (!LastName) return new Response(JSON.stringify({ message: "Last name is required" }), { status: 400 });
-      if (!email) return new Response(JSON.stringify({ message: "Email is required" }), { status: 400 });
-      if (!password) return new Response(JSON.stringify({ message: "Password is required" }), { status: 400 });
-      if (!phone) return new Response(JSON.stringify({ message: "Phone number is required" }), { status: 400 });
-      console.log(FirstName)
-      // Check if user already exists
-      const existingUser = await userModel.findOne({ email });
-      if (existingUser) {
-        return new Response(JSON.stringify({ success: false, message: "Already registered, please login" }), { status: 409 });
-      }
-  
-      // Hash the password
-      const hashedPassword = await hashPassword(password);
-  
-      // Register user
-      const newUser = await new userModel({ FirstName, LastName, email, phone, password: hashedPassword }).save();
-  
-      return new Response(
-        JSON.stringify({ success: true, message: "User registered successfully!", user: newUser }),
-        { status: 201, headers: { "Content-Type": "application/json" } }
-      );
-    } catch (error) {
-      console.error("Error in registration:", error);
-      return new Response(
-        JSON.stringify({ success: false, message: "Error in registration", error: error.message }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
+  try {
+    console.log("Register API called");
+
+    const { FirstName, LastName, email, password, phone } = await req.json();
+
+    // Validation
+    if (!FirstName) return new Response(JSON.stringify({ message: "First name is required" }), { status: 400 });
+    if (!LastName) return new Response(JSON.stringify({ message: "Last name is required" }), { status: 400 });
+    if (!email) return new Response(JSON.stringify({ message: "Email is required" }), { status: 400 });
+    if (!password) return new Response(JSON.stringify({ message: "Password is required" }), { status: 400 });
+    if (!phone) return new Response(JSON.stringify({ message: "Phone number is required" }), { status: 400 });
+
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      return new Response(JSON.stringify({ success: false, message: "Already registered, please login" }), { status: 409 });
     }
-  };
+
+    const hashedPassword = await hashPassword(password);
+
+    // Load default profile picture from file
+    const imagePath = path.join(process.cwd(), "public", "images", "default-profile.jpg");
+    const defaultImage = fs.readFileSync(imagePath);
+
+    const newUser = await new userModel({
+      FirstName,
+      LastName,
+      email,
+      phone,
+      password: hashedPassword,
+      profilePicture: {
+        data: defaultImage,
+        contentType: "image/jpeg",
+      },
+    }).save();
+
+    return new Response(
+      JSON.stringify({ success: true, message: "User registered successfully!", user: newUser }),
+      { status: 201, headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Error in registration:", error);
+    return new Response(
+      JSON.stringify({ success: false, message: "Error in registration", error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+};
+
 
 
   export const registerAdminController = async (req) => {
@@ -195,66 +210,67 @@ export const ForgotPasswordController = async (req, res) => {
   //reset password controller
   export const ResetPasswordController = async (req) => {
     try {
-      const { password, token, userId } = await req.json();
-      const userToken = await resetTokenModel.findOne({ user_id: userId })
+      const { password, token, email } = await req.json();
+  
+      if (!email || !token || !password) {
+        return new Response(
+          JSON.stringify({ success: false, message: "All fields are required." }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+  
+      const user = await userModel.findOne({ email });
+      if (!user) {
+        return new Response(
+          JSON.stringify({ success: false, message: "User not found." }),
+          { status: 404, headers: { "Content-Type": "application/json" } }
+        );
+      }
+  
+      const userToken = await resetTokenModel.findOne({ user_id: user._id.toString() })
         .sort({ createdAt: -1 })
         .limit(1);
   
       if (!userToken) {
         return new Response(
-          JSON.stringify({ success: false, message: "Some problem occurred!" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          }
+          JSON.stringify({ success: false, message: "No valid reset token found." }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
         );
       }
   
-      if (new Date() > new Date(userToken.expires_at)) {
+      if (new Date() > new Date(userToken.expiresAt)) {
         return new Response(
-          JSON.stringify({ success: false, message: "Reset Password link has expired!" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          }
+          JSON.stringify({ success: false, message: "Reset token has expired." }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
         );
       }
   
       if (userToken.token !== token) {
         return new Response(
-          JSON.stringify({ success: false, message: "Reset Password link is invalid!" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          }
+          JSON.stringify({ success: false, message: "Invalid reset token." }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
         );
       }
   
-      await resetTokenModel.deleteMany({ user_id: userId });
+      // Delete all reset tokens for the user
+      await resetTokenModel.deleteMany({ user_id: user._id.toString() });
   
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      await userModel.findByIdAndUpdate(userId, { password: hashedPassword });
+      // Hash and update password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await userModel.findByIdAndUpdate(user._id, { password: hashedPassword });
   
       return new Response(
-        JSON.stringify({ success: true, message: "Your password was reset successfully!" }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        }
+        JSON.stringify({ success: true, message: "Password reset successfully." }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
       );
     } catch (err) {
-      console.error(err);
+      console.error("Reset Password Error:", err);
       return new Response(
         JSON.stringify({ success: false, message: "Internal Server Error" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
   };
-  
   
   // UPDATE PROFILE CONTROLLER
   export const UpdateProfileController = async (req) => {
@@ -292,3 +308,146 @@ export const ForgotPasswordController = async (req, res) => {
       return { success: false, message: "Server Error", status: 500 };
     }
   };
+
+  //update-profile controller
+  export const updateProfileController = async (req) => {
+    try {
+      const formData = await req.formData();
+  
+      const email = formData.get("email");
+      const FirstName = formData.get("FirstName");
+      const LastName = formData.get("LastName");
+      const file = formData.get("profilePicture"); // type: File
+  
+      if (!email) {
+        return new Response(JSON.stringify({ message: "Email is required" }), { status: 400 });
+      }
+  
+      const user = await userModel.findOne({ email });
+      if (!user) {
+        return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });
+      }
+  
+      user.FirstName = FirstName || user.FirstName;
+      user.LastName = LastName || user.LastName;
+  
+      if (file && file.name !== "undefined") {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        user.profilePicture = {
+          data: buffer,
+          contentType: file.type,
+        };
+      }
+  
+      await user.save();
+  
+      return new Response(JSON.stringify({ success: true, message: "Profile updated", user }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      return new Response(JSON.stringify({ success: false, message: "Error updating profile", error: error.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  };
+
+  //change password controller
+  export const changePasswordController = async (request) => {
+    try {
+      console.log("Change Password API called");
+  
+      const body = await request.json(); // ✅ Fix is here
+      const { email, currentPassword, newPassword } = body;
+  
+      if (!email || !currentPassword || !newPassword) {
+        return new Response(
+          JSON.stringify({ success: false, message: "All fields are required" }),
+          { status: 400 }
+        );
+      }
+  
+      const user = await userModel.findOne({ email });
+  
+      if (!user) {
+        return new Response(
+          JSON.stringify({ success: false, message: "User not found" }),
+          { status: 404 }
+        );
+      }
+  
+      const isMatch = await comparePassword(currentPassword, user.password);
+      if (!isMatch) {
+        return new Response(
+          JSON.stringify({ success: false, message: "Incorrect current password" }),
+          { status: 401 }
+        );
+      }
+  
+      const hashed = await hashPassword(newPassword);
+      user.password = hashed;
+      await user.save();
+  
+      return new Response(
+        JSON.stringify({ success: true, message: "Password changed successfully" }),
+        { status: 200 }
+      );
+    } catch (error) {
+      console.error("Error in change password:", error);
+      return new Response(
+        JSON.stringify({ success: false, message: "Failed to change password", error: error.message }),
+        { status: 500 }
+      );
+    }
+  };
+
+  //resetToken controller
+  
+export const createResetTokenController = async (req) => {
+  try {
+    const { email, token } = await req.json();
+
+    if (!email || !token) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Email and token are required" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return new Response(
+        JSON.stringify({ success: false, message: "User not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Remove existing tokens
+    await resetToken.deleteMany({ user_id: user._id.toString() });
+
+    const now = new Date();
+    const expiry = new Date(now.getTime() + 15 * 60 * 1000); // 15 minutes from now
+
+    const newToken = new resetToken({
+      token,
+      createdAt: now,
+      expiresAt: expiry,
+      user_id: user._id.toString(),
+    });
+
+    await newToken.save();
+
+    return new Response(
+      JSON.stringify({ success: true, message: "Reset token created successfully." }),
+      { status: 201, headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Reset token error:", error);
+    return new Response(
+      JSON.stringify({ success: false, message: "Internal server error", error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+};

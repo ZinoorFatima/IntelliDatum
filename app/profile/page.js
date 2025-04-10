@@ -1,116 +1,88 @@
 "use client"
-import React from 'react'
-//import { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/auth";
+import Image from "next/image";
+import Link from "next/link";
 
+export default function ProfilePage() {
+  const [auth] = useAuth();
+  const user = auth?.user;
+  const [profileImage, setProfileImage] = useState(null);
 
-const UserDetails = () => {
-    //const [selectedFile, setSelectedFile] = useState(null);
-    //const [fileDetails, setFileDetails] = useState(null);
-    //const [FirstName,setFirstName] = useState('')
-    //const [LastName, setLastName] = useState('')
-    //const [email, setEmail] = useState('')
- /* const handleFileChange = (event) => {
-    const file = event.target.files[0]; // Get the first selected file
-    setSelectedFile(file);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (selectedFile) {
-      setFileDetails({
-        name: selectedFile.name,
-        size: `${(selectedFile.size / 1024).toFixed(2)} KB`, // Convert size to KB
-        status: 'Processing...',
-      });
+  // Fetch profile image from API when user is loaded
+  useEffect(() => {
+    if (user?.email) {
+      setProfileImage(`/api/user/profile-picture?email=${user.email}`);
     }
-  };*/
+  }, [user]);
 
   return (
-    <div style={{display:'flex', flexDirection: 'column',alignItems: 'center',}}>
-        <div
-        style={{backgroundColor:'#C0D7BA', marginTop:'5%', width:'80%',
-             height:'50px',
-              padding:'10px',
-               borderRadius:'10px'}}
-        >
-            <h3 style={{color:'#484848'}}>
-                User Details
-            </h3>
-        </div>
-            
-        <div className = "row"
-        style={{backgroundColor:'#fff',width:'80%',
-            height:'100%', border:'1px', border: '2px solid #000',
-            marginTop:'20px', borderRadius:'10px' }}
-        >
-            <div className='col-3'>
-                <img src='User.png' style={{height:'200px', width:'200px'}} className="card-img-top" alt="..." />
-            </div>      
+    <div className="d-flex flex-column min-vh-100">
+      <main className="container py-5 flex-grow-1">
+        <div className="row justify-content-center">
+          <div className="col-md-8">
+            <div className="card shadow-sm border-0">
+              <div className="card-body p-5">
+                {/* Profile Photo */}
+                <div className="d-flex align-items-center mb-4">
+                  <div style={{ position: 'relative' }}>
+                    {profileImage ? (
+                      <Image
+                        src={profileImage}
+                        alt="Profile"
+                        width={80}
+                        height={80}
+                        className="rounded-circle me-4"
+                        style={{ objectFit: 'cover', border: '3px solid #198754' }}
+                      />
+                    ) : (
+                      <div
+                        className="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fs-3 me-4"
+                        style={{ width: "80px", height: "80px" }}
+                      >
+                        {user?.FirstName?.charAt(0)}
+                        {user?.LastName?.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="mb-0">{user?.FirstName} {user?.LastName}</h3>
+                    <p className="text-muted mb-0">{user?.email}</p>
+                  </div>
+                </div>
 
-            <div className = 'col-9'style={{ padding: '20px' ,display:'flex', flexDirection: 'column'}}>
-                <div className = 'row mb-5' >
-                    FirstName : Sarah 
+                {/* Info List */}
+                <ul className="list-group list-group-flush mb-4">
+                  <li className="list-group-item d-flex justify-content-between">
+                    <span className="fw-bold">First Name:</span>
+                    <span>{user?.FirstName}</span>
+                  </li>
+                  <li className="list-group-item d-flex justify-content-between">
+                    <span className="fw-bold">Last Name:</span>
+                    <span>{user?.LastName}</span>
+                  </li>
+                  <li className="list-group-item d-flex justify-content-between">
+                    <span className="fw-bold">Email:</span>
+                    <span>{user?.email}</span>
+                  </li>
+                </ul>
+
+                {/* Action Buttons */}
+                <div className="d-flex flex-wrap justify-content-center gap-3">
+                  <Link href="/edit-profile" className="btn btn-outline-success">Edit Profile</Link>
+                  <Link href="/change-password" className="btn btn-outline-secondary">Change Password</Link>
+                  <button className="btn btn-danger" onClick={() => {
+                    localStorage.removeItem("auth");
+                    window.location.href = "/signin";
+                  }}>
+                    Logout
+                  </button>
                 </div>
-                <div className = 'row mb-5'>
-                    LastName : Ali
-                </div>
-                <div className = 'row '>
-                    Email : saraAli@nu.edu.pk 
-                </div>
-                
-            </div>
-        </div>
-        
-        <div
-        style={{backgroundColor:'#C0D7BA', marginTop:'5%', width:'80%',
-             height:'50px',
-              padding:'10px',
-               borderRadius:'10px'}}
-        >
-            <h3 style={{color:'#484848'}}>
-                User Files
-            </h3>
-        </div>
-        <div
-        style={{backgroundColor:'#fff',width:'80%',
-            height:'100%', border:'1px', border: '2px solid #000',
-            marginTop:'20px', borderRadius:'10px', marginBottom:'20%' }}
-        >
-            <div style={{ padding: '20px' ,display:'flex', flexDirection: 'column'}}>
-            <div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontWeight: 'bold',
-                marginBottom: '10px',
-              }}
-            >
-              <div style={{ width: '40%' }}>Filename</div>
-              <div style={{ width: '30%' }}>File Size</div>
-              <div style={{ width: '30%' }}>Status</div>
-            </div>
-            {/*fileDetails && (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginBottom: '10px',
-                }}
-              >
-                <div style={{ width: '40%' }}>{fileDetails.name}</div>
-                <div style={{ width: '30%' }}>{fileDetails.size}</div>
-                <div style={{ width: '30%' }}>{fileDetails.status}</div>
               </div>
-            )*/}
-          </div>
-                
             </div>
+          </div>
         </div>
-
+      </main>
     </div>
-    
-  )
+  );
 }
-
-export default UserDetails

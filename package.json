@@ -12,6 +12,8 @@
     "bcrypt": "^5.1.1",
     "bootstrap": "^5.3.3",
     "crypto": "^1.0.1",
+    "email-js": "^2.0.3",
+    "emailjs-com": "^3.2.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",
     "next": "15.0.4",

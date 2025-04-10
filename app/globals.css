@@ -8,6 +8,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.text-justify {
+  text-align: justify;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -20,11 +24,11 @@ code {
 
 
 .navbar{
-  font-weight: 400;
+  font-weight: 500;
   font-style: normal;
-  line-height: 40px;
+  line-height: 20px;
   text-transform:  uppercase;
-  background-color: #A0D49D !important;
+  background-color: #f8f9fa ; /*#A0D49D !important;*/
 }
 
 .navbar-nav {
@@ -33,28 +37,41 @@ code {
 
 
 .navbar.navbar-expand-lg {
-  background-color: #A0D49D !important;
+  background-color: #f8f9fa; /*#A0D49D !important;*/
 }
 
 .navbar-brand{
-  border-bottom: 0px solid #484848 !important;
-  margin-right: 10%;
+  border-bottom: 0px solid #198754 !important;
+  margin-right: 20%;
 }
 
-.nav-link{
-  color: #484848!important;
+.nav-link {
+  color: #198754 !important;
   font-weight: 500 !important;
+  transition: color 0.3s ease;
 }
+
+.nav-link:hover {
+  color: #145c32 !important; /* Darker green on hover */
+  text-decoration: underline; /* Optional, for more hover feedback */
+}
+
 
 .container-fluid{
   padding-left: 2%;
   padding-top: 2%;
 }
 
+.nav-login-link{
+  color: #f8f9fa;
+  font-weight: 500;
+  padding: 5px ;
+  text-align: center;
+}
+
 .nav-item-login {
-  margin-left: 3px;
-  background-color: #7BC28A;
-  color: 484848;
+  margin-left: 5px;
+  background-color: #198754; /*#7BC28A;*/
   text-decoration: none;
   border-radius: 5px;
   text-align: center;
@@ -68,24 +85,20 @@ code {
 /* footer*/
 .footer{
   font-size: small;
-  line-height: 26px;
+  line-height: 10px;
   padding: 25px;
   text-transform:  uppercase;
   text-align: center;
-  background-color: #A0D49D !important;
+  background-color: #198754 !important;
   align-self: center;
 }
 
-.footer a{
+.rights{
   text-decoration: none;
-  color: white;
+  color: #f8f9fa;
   padding: 10px;
 }
 
-.footer a:hover{
-  color: #426940;
-  border-bottom: 1px solid #426940;
-}
 
 
 

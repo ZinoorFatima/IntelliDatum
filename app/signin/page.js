@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '../context/auth';
 import toast from 'react-hot-toast';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 const Signin = () => {
     const router = useRouter();
     const [email, setEmail] = useState("");
@@ -51,9 +53,8 @@ const Signin = () => {
       };
 
     return (
-        <div
+        <div className='bg-success'
         style={{
-          backgroundColor: '#A0D49D',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -123,7 +124,7 @@ const Signin = () => {
             style={{
               width: '80%',
               padding: '10px',
-              backgroundColor: '#7BC28A',
+              backgroundColor: '#198754',
               color: 'white',
               border: 'none',
               borderRadius: '30px',
