@@ -55,9 +55,10 @@ const SignUp = () => {
       return false;
     }
 
-    const passwordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&#^])[A-Za-z\d@$!%?&#^]{8,}$/;
+    //const passwordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&#^])[A-Za-z\d@$!%?&#^]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&#^])[A-Za-z\d@$!%?&#^]{8,}$/;
+  
     
-
     if (!passwordRegex.test(password)) {
       alert(
         "Password must be at least 8 characters long and include:\n- One uppercase letter\n- One lowercase letter\n- One number\n- One special character"
