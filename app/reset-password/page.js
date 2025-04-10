@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -12,13 +11,9 @@ export default function ResetPasswordPage() {
     password: '',
   });
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [status, setStatus] = useState({ message: '', type: '' });
   const [loading, setLoading] = useState(false);
-
-  const validatePassword = (password) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/;
-    return regex.test(password);
-  };
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,15 +27,19 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setStatus({ message: '', type: '' });
+    setLoading(true);
 
+    // Check if password meets the criteria
     if (!validatePassword(formData.password)) {
-      toast.error(
-        'Password must be at least 8 characters, with 1 uppercase, 1 lowercase, 1 number, and 1 special character.'
-      );
+      setStatus({
+        message: 'Password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.',
+        type: 'danger',
+      });
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
     try {
       const res = await fetch('/api/auth/reset-password', {
         method: 'POST',
@@ -51,16 +50,18 @@ export default function ResetPasswordPage() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success(data.message || 'Password reset successful.');
+        setStatus({ message: data.message, type: 'success' });
+
+        // Wait 2 seconds and then redirect to login
         setTimeout(() => {
           router.push('/signin');
-        }, 1500);
+        }, 500);
       } else {
-        toast.error(data.message || 'Reset failed.');
+        setStatus({ message: data.message, type: 'danger' });
       }
     } catch (error) {
-      console.error('Reset Error:', error);
-      toast.error('Something went wrong!');
+      console.error("Error during Resetting Password:", error, status);
+      setStatus({ message: 'Something went wrong!', type: 'danger' });
     } finally {
       setLoading(false);
     }
