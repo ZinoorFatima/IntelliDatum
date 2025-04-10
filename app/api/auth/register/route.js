@@ -3,6 +3,7 @@
 export async function POST(req) {
     
     console.log("Register request body:", req); // Check Amplify logs
+    await connectDB();
     return new Response(
         JSON.stringify({
           success: true,
