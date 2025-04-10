@@ -119,6 +119,31 @@ export default function Home() {
         ))}
       </div>
     </div>
+
+    {/* Collaborators Section */}
+    <div className="container py-5">
+      <h2 className="text-success fw-bold text-center mb-4">Our Collaborators</h2>
+      <div className="row justify-content-center align-items-center text-center">
+        <div className="col-6 col-md-2 mb-4">
+          <img 
+            src="/logos/logo1.png" 
+            alt="FAST NUCES" 
+            className="img-fluid" 
+            style={{ maxHeight: '80px', objectFit: 'contain' }} 
+          />
+        </div>
+        <div className="col-6 col-md-2 mb-4">
+          <img 
+            src="/logos/logo2.png" 
+            alt="Data Insight Lab" 
+            className="img-fluid" 
+            style={{ maxHeight: '80px', objectFit: 'contain' }} 
+          />
+        </div>
+      </div>
+    </div>
+
+
   </div>
 
   );
