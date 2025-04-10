@@ -24,6 +24,12 @@ export default function ResetPasswordPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Password validation function
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&#^])[A-Za-z\d@$!%?&#^]{8,}$/;
+    return regex.test(password);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
