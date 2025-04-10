@@ -2,15 +2,24 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../app/context/auth";
 
 const Header = () => {
   const [auth, setAuth] = useAuth();
+  const [profileImage, setProfileImage] = useState("/images/default-profile.jpg"); // default initially
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap.bundle.min.js");
-  }, []);
+
+    if (auth?.user?.email) {
+      setProfileImage(`/api/user/profile-picture?email=${auth.user.email}`);
+    }
+  }, [auth]);
+
+  const handleImageError = () => {
+    setProfileImage("/default-profile.png"); // fallback if fetch fails
+  };
 
   const handleLogout = () => {
     setAuth({ user: null, token: "" });
@@ -31,7 +40,7 @@ const Header = () => {
               className="me-2"
               priority
             />
-            <span className="fw-bold text-success fs-3  ">IntelliDatum</span>
+            <span className="fw-bold text-success fs-3">IntelliDatum</span>
           </div>
         </Link>
 
@@ -67,11 +76,12 @@ const Header = () => {
               </Link>
             </li>
 
-            
-
             {!auth?.user ? (
               <li className="nav-item">
-                <Link href="/signin" className="btn btn-success px-3 ms-3 text-white">
+                <Link
+                  href="/signin"
+                  className="btn btn-success px-3 ms-3 text-white"
+                >
                   Login
                 </Link>
               </li>
@@ -85,13 +95,14 @@ const Header = () => {
                   aria-expanded="false"
                 >
                   <Image
-                      src={`/api/user/profile-picture?email=${auth.user.email}`}
-                      alt="Profile Picture"
-                      width={40}
-                      height={40}
-                      className="rounded-circle me-2 object-fit-cover"
-                      style={{ objectFit: "cover" }}
-                    />
+                    src={profileImage}
+                    alt="Profile Picture"
+                    width={40}
+                    height={40}
+                    className="rounded-circle me-2"
+                    style={{ objectFit: "cover" }}
+                    onError={handleImageError}
+                  />
                 </a>
                 <ul className="dropdown-menu dropdown-menu-end">
                   <li>

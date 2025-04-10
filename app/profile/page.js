@@ -7,10 +7,11 @@ import Link from "next/link";
 export default function ProfilePage() {
   const [auth] = useAuth();
   const user = auth?.user;
-  const [profileImage, setProfileImage] = useState(null);
+  const [profileImage, setProfileImage] = useState("/images/default-profile.jpg");
 
   // Fetch profile image from API when user is loaded
   useEffect(() => {
+    console.log("GETTING PROFILE PICTURE:", user.email);
     if (user?.email) {
       setProfileImage(`/api/user/profile-picture?email=${user.email}`);
     }

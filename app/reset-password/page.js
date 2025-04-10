@@ -13,15 +13,32 @@ export default function ResetPasswordPage() {
 
   const [status, setStatus] = useState({ message: '', type: '' });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Password validation function
+  const validatePassword = (password) => {
+    const regex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/;
+    return regex.test(password);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ message: '', type: '' });
     setLoading(true);
+
+    // Check if password meets the criteria
+    if (!validatePassword(formData.password)) {
+      setStatus({
+        message: 'Password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.',
+        type: 'danger',
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch('/api/auth/reset-password', {
@@ -56,7 +73,7 @@ export default function ResetPasswordPage() {
         <h3 className="text-center mb-4">Reset Password</h3>
 
         {status.message && (
-          <div className={`alert alert-${status.type}`} role="alert">
+          <div className="alert alert-${status.type}" role="alert">
             {status.message}
           </div>
         )}
@@ -86,9 +103,9 @@ export default function ResetPasswordPage() {
             />
           </div>
 
-          <div className="mb-3">
+          <div className="mb-3 position-relative">
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'} // Toggle password visibility
               name="password"
               className="form-control"
               placeholder="Enter new password"
@@ -96,6 +113,13 @@ export default function ResetPasswordPage() {
               onChange={handleChange}
               required
             />
+            <button
+              type="button"
+              className="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent"
+              onClick={() => setShowPassword(!showPassword)} // Toggle visibility on click
+            >
+              {showPassword ? '🙈' : '👁'} {/* Custom icons for show/hide */}
+            </button>
           </div>
 
           <button type="submit" className="btn btn-success w-100" disabled={loading}>
