@@ -34,7 +34,7 @@ const SignUp = () => {
         },
         body: JSON.stringify(data),
       });
-      console.log("Works")
+      console.log("Works",res)
       router.push("/signin"); 
       //const result = await res.json();
       //if (res.ok) {
