@@ -1,5 +1,5 @@
 //import { registerController } from "../../../../controllers/authcontroller"; // Adjust path as needed
-//import { connectDB } from "../../../lib/db";
+import { connectDB } from "../../../lib/db";
 export async function POST(req) {
     
     console.log("Register request body:", req); // Check Amplify logs
