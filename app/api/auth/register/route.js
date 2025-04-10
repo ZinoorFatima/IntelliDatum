@@ -1,17 +1,18 @@
 import { registerController } from "../../../../controllers/authcontroller"; // Adjust path as needed
 import { connectDB } from "../../../lib/db";
 export async function POST(req) {
-    
-    console.log("Register request body:", req.body); // Check Amplify logs
     try {
         await connectDB();
-        console.log("hejrhe")
-        return registerController(req);
-        //res.status(200).json({ success: true });
-    } catch (error) {
+        const data = await req.json(); // Parse the stream
+        console.log("Request data:", data);
+        return registerController(data); // Pass parsed data
+      } catch (error) {
         console.error("Registration error:", error);
-        //res.status(500).json({ error: error.message });
-    }
+        return new Response(
+          JSON.stringify({ error: error.message }),
+          { status: 500 }
+        );
+      }
 }
 
 export async function GET() {

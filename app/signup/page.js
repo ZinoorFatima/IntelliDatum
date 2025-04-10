@@ -26,6 +26,7 @@ const SignUp = () => {
     };
 
     try {
+      console.log("calling api")
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
@@ -33,14 +34,16 @@ const SignUp = () => {
         },
         body: JSON.stringify(data),
       });
-      const result = await res.json();
-      if (res.ok) {
-        console.log("Signup successful:", result);
-        router.push("/signin");
-      } else {
-        console.error("Signup failed:", result);
-        alert(result.message || "Signup failed");
-      }
+      console.log("Works")
+      router.push("/signin"); 
+      //const result = await res.json();
+      //if (res.ok) {
+      //  console.log("Signup successful:", result);
+      //  router.push("/signin");
+      //} else {
+      //  console.error("Signup failed:", result);
+      //  alert(result.message || "Signup failed");
+      //}
     } catch (error) {
       console.error("Error during signup:", error);
       toast("Error during signup");
