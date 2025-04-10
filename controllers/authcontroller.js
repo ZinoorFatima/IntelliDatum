@@ -34,7 +34,7 @@ export const registerController = async (req) => {
     const hashedPassword = await hashPassword(password);
 
     // Load default profile picture from file
-    const imagePath = path.join(process.cwd(), "public", "images", "default-profile.jpg");
+    const imagePath = path.join(process.cwd(), "public", "default-profile.jpg");
     const defaultImage = fs.readFileSync(imagePath);
 
     const newUser = await new userModel({

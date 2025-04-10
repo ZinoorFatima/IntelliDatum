@@ -7,7 +7,7 @@ import { useAuth } from "../app/context/auth";
 
 const Header = () => {
   const [auth, setAuth] = useAuth();
-  const [profileImage, setProfileImage] = useState("/images/default-profile.jpg"); // default initially
+  const [profileImage, setProfileImage] = useState("/default-profile.jpg"); // default initially
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap.bundle.min.js");
@@ -18,7 +18,7 @@ const Header = () => {
   }, [auth]);
 
   const handleImageError = () => {
-    setProfileImage("/images/default-profile.jpg"); // fallback if fetch fails
+    setProfileImage("/default-profile.jpg"); // fallback if fetch fails
   };
 
   const handleLogout = () => {
