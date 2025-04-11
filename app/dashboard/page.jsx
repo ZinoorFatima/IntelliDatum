@@ -54,30 +54,38 @@ export default function DashboardPage() {
     fetchFiles();
   }, [userId, auth.token]); // Fetch files when userId or token changes
 
-  const handleView = (dict) => {
-    if (!dict) {
-      alert("❌ No dictionary available.");
+  const handleView = (dictionary) => {
+    if (!dictionary || !dictionary.content) {
+      alert("❌ No dictionary content available.");
     } else {
-      alert(JSON.stringify(dict, null, 2));
+      const isXml = dictionary.content.trim().startsWith("<");
+      const title = isXml ? "📄 XML View:" : "📄 Text View:";
+      alert(`${title}\n\n${dictionary.content}`);
     }
   };
+  
 
   const handleEdit = (id) => {
     alert(`🛠️ Open editor for file ID: ${id}`);
   };
 
-  const handleDownload = (dict) => {
-    if (!dict) return;
-    const blob = new Blob([JSON.stringify(dict, null, 2)], {
+  const handleDownload = (dictionary) => {
+    if (!dictionary || !dictionary.content || !dictionary.name) {
+      alert("❌ Invalid dictionary data.");
+      return;
+    }
+  
+    const blob = new Blob([dictionary.content], {
       type: "application/octet-stream",
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "dictionary.epf";
+    a.download = `${dictionary.name}.epf`;
     a.click();
     URL.revokeObjectURL(url);
   };
+  
 
   const total = files.length;
   const success = files.filter((f) => f.status === "Success").length;

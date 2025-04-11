@@ -40,7 +40,7 @@ const Page = () => {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      const response = await fetch("http://127.0.0.1:5000/process", {
+      const response = await fetch(`${process.env.BACKEND_API}/process`, {
         method: "POST",
         body: formData,
       });

@@ -96,10 +96,10 @@ export const readFilesController = async (req) => {
             );
         }
 
-        // Fetch fileName and status fields for the matching user
-        const files = await fileModel.find({ userId });
+        // Fetch fileName, status, and dictionary fields for the matching user
+        const files = await fileModel.find({ userId }).select("fileName status dictionary");
 
-        if (!files) {
+        if (!files || files.length === 0) {
             return new Response(
                 JSON.stringify({ message: `No files found for userId: ${userId}` }),
                 { status: 404, headers: { "Content-Type": "application/json" } }
