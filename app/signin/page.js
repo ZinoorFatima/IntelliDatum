@@ -12,15 +12,19 @@ const Signin = () => {
   const [password, setPassword] = useState("");
   const [auth, setAuth] = useAuth("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
 
   const handleNavigation = async (e) => {
     e.preventDefault();
-  
+    
+    // Set loading to true when the request starts
+    setLoading(true);
+
     const data = {
       email: email,
       password: password
     };
-  
+
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -30,7 +34,7 @@ const Signin = () => {
         body: JSON.stringify(data),
       });
       const result = await res.json();
-  
+
       if (res.ok) {
         setAuth({
           ...auth,
@@ -45,6 +49,9 @@ const Signin = () => {
     } catch (error) {
       console.error("Error during Login:", error);
       toast("Error during Login");
+    } finally {
+      // Set loading to false when the request is complete
+      setLoading(false);
     }
   };
 
@@ -142,8 +149,9 @@ const Signin = () => {
             cursor: 'pointer',
             marginBottom: '10%',
           }}
+          disabled={loading} // Disable the button while loading
         >
-          Login
+          {loading ? 'Logging in...' : 'Login'}
         </button>
 
         <div
