@@ -1,12 +1,11 @@
-"use client"
-import React from 'react'
+"use client";
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
-const SignUp = () => {
 
+const SignUp = () => {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -14,8 +13,7 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [showPassword, setShowPassword] = useState(false); // 👁 Toggle
-
-
+  const [loading, setLoading] = useState(false); // Loading state
 
   const validateForm = () => {
     if (!firstName.trim()) {
@@ -55,10 +53,7 @@ const SignUp = () => {
       return false;
     }
 
-    //const passwordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&#^])[A-Za-z\d@$!%?&#^]{8,}$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&#^])[A-Za-z\d@$!%?&#^]{8,}$/;
-  
-    
     if (!passwordRegex.test(password)) {
       alert(
         "Password must be at least 8 characters long and include:\n- One uppercase letter\n- One lowercase letter\n- One number\n- One special character"
@@ -69,24 +64,23 @@ const SignUp = () => {
     return true;
   };
 
- 
-
   const handleNavigation = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
+    setLoading(true); // Start loading
 
     const data = {
       FirstName: firstName,
       LastName: lastName,
-      email:email,
-      password:password,
-      phone: phone,  // include if your API requires it
+      email: email,
+      password: password,
+      phone: phone, // Include if your API requires it
     };
 
     try {
-      console.log("calling api")
+      console.log("Calling API...");
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
@@ -94,9 +88,7 @@ const SignUp = () => {
         },
         body: JSON.stringify(data),
       });
-      //console.log("Works",res)
-      //router.push("/signin"); 
-      
+
       if (res.ok) {
         console.log("Signup successful:", res);
         router.push("/signin");
@@ -107,65 +99,61 @@ const SignUp = () => {
     } catch (error) {
       console.error("Error during signup:", error);
       toast("Error during signup");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   return (
-    
     <div
-    style={{
-      backgroundColor: '#198754',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '50vh', 
-    }}
-  >
-      <div style={{
-          maxWidth: '80%',
-          width: '100%',display: 'flex', margin:'20px auto'}}>
-
-        <div style={{ width: '30%', backgroundColor: '#f0f0f0' ,borderBottomLeftRadius:'20px', borderTopLeftRadius: '20px',}}>
-        <Image
-                    src="/MistyHills.png"  
-                    alt="Logo 1"
-                    width={150}
-                    height={150}
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover' ,
-                      borderBottomLeftRadius:'20px',
-                      borderTopLeftRadius: '20px',
-                    }} 
-                  />
-          </div>
+      style={{
+        backgroundColor: '#198754',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '50vh',
+      }}
+    >
+      <div style={{ maxWidth: '80%', width: '100%', display: 'flex', margin: '20px auto' }}>
+        <div style={{ width: '30%', backgroundColor: '#f0f0f0', borderBottomLeftRadius: '20px', borderTopLeftRadius: '20px' }}>
+          <Image
+            src="/MistyHills.png"
+            alt="Logo 1"
+            width={150}
+            height={150}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderBottomLeftRadius: '20px',
+              borderTopLeftRadius: '20px',
+            }}
+          />
+        </div>
         <div
           style={{
             width: '70%',
-            
             padding: '6%',
             border: '1px solid #ccc',
-            borderBottomRightRadius:'20px',
+            borderBottomRightRadius: '20px',
             borderTopRightRadius: '20px',
-            
             backgroundColor: '#E5E9D2',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center', 
+            alignItems: 'center',
           }}
         >
           <h2 style={{ textAlign: 'center', marginBottom: '10%' }}>Create Account</h2>
-          
-          
+
           <div style={{ marginBottom: '5%', width: '100%', textAlign: 'center' }}>
             <input
               type="name"
               id="Firstname"
               name="Firstname"
-              value ={firstName} onChange={(e) => setFirstName(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               style={{
-                width: '80%', // Adjust to desired width
+                width: '80%',
                 padding: '8px',
                 boxSizing: 'border-box',
               }}
@@ -178,9 +166,10 @@ const SignUp = () => {
               type="name"
               id="Lastname"
               name="Lastname"
-              value ={lastName} onChange={(e) => setLastName(e.target.value)}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               style={{
-                width: '80%', // Adjust to desired width
+                width: '80%',
                 padding: '8px',
                 boxSizing: 'border-box',
               }}
@@ -194,9 +183,10 @@ const SignUp = () => {
               type="email"
               id="email"
               name="email"
-              value ={email} onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               style={{
-                width: '80%', // Adjust to desired width
+                width: '80%',
                 padding: '8px',
                 boxSizing: 'border-box',
               }}
@@ -204,16 +194,17 @@ const SignUp = () => {
               required
             />
           </div>
+
           {/* Phone Input */}
           <div style={{ marginBottom: '5%', width: '100%', textAlign: 'center' }}>
-          <input
+            <input
               type="tel"
               id="phone"
               name="phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               style={{
-                width: '80%', // Adjust to desired width
+                width: '80%',
                 padding: '8px',
                 boxSizing: 'border-box',
               }}
@@ -221,8 +212,9 @@ const SignUp = () => {
               required
             />
           </div>
-           {/* Password with Eye */}
-           <div style={{ marginBottom: "5%", width: "100%", textAlign: "center", position: "relative" }}>
+
+          {/* Password with Eye */}
+          <div style={{ marginBottom: "5%", width: "100%", textAlign: "center", position: "relative" }}>
             <input
               type={showPassword ? "text" : "password"}
               value={password}
@@ -251,8 +243,6 @@ const SignUp = () => {
             </span>
           </div>
 
-          
-
           <button
             type="submit"
             onClick={handleNavigation}
@@ -266,28 +256,27 @@ const SignUp = () => {
               cursor: 'pointer',
               marginBottom: '10%',
             }}
+            disabled={loading} // Disable button when loading
           >
-            Create
+            {loading ? 'Creating account...' : 'Create'}
           </button>
 
-      
           <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'row',
-              gap: '5px',
-            }}>
-            <div >Already have an account?</div>
-            <Link href="/signin"style={{
-              color:'black'
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'row',
+            gap: '5px',
+          }}>
+            <div>Already have an account?</div>
+            <Link href="/signin" style={{
+              color: 'black'
             }}>Login</Link>
           </div>
         </div>
       </div>
-  </div>
-  
-);
-}
+    </div>
+  );
+};
 
-export default SignUp
+export default SignUp;

@@ -7,6 +7,7 @@ export default function EditProfile() {
   const [auth, setAuth] = useAuth();
   const [form, setForm] = useState({ FirstName: "", LastName: "" });
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false); // Loading state
   const router = useRouter();
 
   useEffect(() => {
@@ -26,6 +27,8 @@ export default function EditProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Set loading to true when the update starts
+
     const formData = new FormData();
 
     formData.append("FirstName", form.FirstName);
@@ -33,24 +36,32 @@ export default function EditProfile() {
     formData.append("email", auth.user.email);
     if (file) formData.append("profilePicture", file);
 
-    const res = await fetch("/api/auth/update-profile", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("/api/auth/update-profile", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
-    alert(data.message);
-    if (data.success && data.user) {
-      const updatedUser = {
-        ...auth.user,
-        FirstName: data.user.FirstName,
-        LastName: data.user.LastName,
-        profilePicture: data.user.profilePicture,
-      };
+      const data = await res.json();
+      alert(data.message);
 
-      setAuth({ ...auth, user: updatedUser });
-      localStorage.setItem("auth", JSON.stringify({ ...auth, user: updatedUser }));
-      router.push("/profile");
+      if (data.success && data.user) {
+        const updatedUser = {
+          ...auth.user,
+          FirstName: data.user.FirstName,
+          LastName: data.user.LastName,
+          profilePicture: data.user.profilePicture,
+        };
+
+        setAuth({ ...auth, user: updatedUser });
+        localStorage.setItem("auth", JSON.stringify({ ...auth, user: updatedUser }));
+        router.push("/profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating your profile.");
+    } finally {
+      setLoading(false); // Set loading to false once the update is done
     }
   };
 
@@ -101,7 +112,15 @@ export default function EditProfile() {
                       className="form-control"
                     />
                   </div>
-                  <button type="submit" className="btn btn-success w-100">Update Profile</button>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    className="btn btn-success w-100"
+                    disabled={loading} // Disable button while loading
+                  >
+                    {loading ? "Updating..." : "Update Profile"} {/* Update button text */}
+                  </button>
                 </form>
               </div>
             </div>
