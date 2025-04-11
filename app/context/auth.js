@@ -35,6 +35,16 @@ const AuthProvider = ({ children }) => {
   );
 };
 
+export const getAuthUserId = async (req) => {
+  try {
+      const { user } = req.auth;  // Assuming the user information is attached to the request, like from middleware
+      return user ? user.id : null;
+  } catch (error) {
+      console.error("Error extracting user ID:", error);
+      return null;
+  }
+};
+
 // Custom Hook for easy usage
 const useAuth = () => useContext(authContext);
 
