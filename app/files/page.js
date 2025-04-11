@@ -118,7 +118,8 @@ const Page = () => {
           dbFormData.append("file", selectedFile);
           dbFormData.append("userId", userId);
           dbFormData.append("status", "Failed");
-          
+          const dictionaryBlob = new Blob([""], { type: "text/plain" });
+          dbFormData.append("dictionary", dictionaryBlob, "");
           await fetch("/api/files/write-file", {
             method: "POST",
             body: dbFormData,
