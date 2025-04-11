@@ -219,6 +219,14 @@ export default function DashboardPage() {
                         View
                       </button>
                       <button
+                        onClick={() => router.push(`/edit-dictionary?fileId=${file._id}`)}
+                        className="btn btn-warning btn-sm me-2"
+                        disabled={!file.dictionary?.content}
+                      >
+                        Edit
+                      </button>
+
+                      <button
                         onClick={() => handleDownload(file.dictionary)}
                         className="btn btn-success btn-sm"
                         disabled={!file.dictionary?.content}

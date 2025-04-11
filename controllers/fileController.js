@@ -126,3 +126,42 @@ export const readFilesController = async (req) => {
         );
     }
 };
+
+export const updateDictionaryController = async (request) => {
+    try {
+      console.log("Update Dictionary API called");
+  
+      const body = await request.json();
+      const { fileId, content } = body;
+  
+      if (!fileId || !content) {
+        return new Response(
+          JSON.stringify({ success: false, message: "fileId and content are required" }),
+          { status: 400 }
+        );
+      }
+  
+      const file = await fileModel.findById(fileId);
+  
+      if (!file) {
+        return new Response(
+          JSON.stringify({ success: false, message: "File not found" }),
+          { status: 404 }
+        );
+      }
+  
+      file.dictionaryFile = content;
+      await file.save();
+  
+      return new Response(
+        JSON.stringify({ success: true, message: "Dictionary updated successfully" }),
+        { status: 200 }
+      );
+    } catch (error) {
+      console.error("Error in update dictionary:", error);
+      return new Response(
+        JSON.stringify({ success: false, message: "Failed to update dictionary", error: error.message }),
+        { status: 500 }
+      );
+    }
+  };

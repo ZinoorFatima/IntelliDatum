@@ -1,11 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
-import { useRouter } from "next/navigation";
 
 const Page = () => {
   const [auth] = useAuth();
-  const router = useRouter();
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileDetails, setFileDetails] = useState(null);
