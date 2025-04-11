@@ -97,7 +97,7 @@ export const readFilesController = async (req) => {
         }
 
         // Fetch fileName, status, and dictionary fields for the matching user
-        const files = await fileModel.find({ userId }).select("fileName status dictionary");
+        const files = await fileModel.find({ userId }).select("fileName status dictionaryName dictionaryFile");
 
         if (!files || files.length === 0) {
             return new Response(

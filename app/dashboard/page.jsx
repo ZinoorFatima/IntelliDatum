@@ -1,33 +1,40 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "../context/auth"; // Import the useAuth hook
+import { useAuth } from "../context/auth";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
-  const [auth] = useAuth(); // Get auth context (user and token)
+  const [auth] = useAuth();
+  const router = useRouter();
   const [files, setFiles] = useState([]);
   const [userId, setUserId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUserId = async () => {
       if (!auth.user) return;
 
-      const response = await fetch(`/api/auth/get-user-id?email=${auth.user.email}`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${auth.token}`,
-        },
-      });
+      try {
+        const response = await fetch(`/api/auth/get-user-id?email=${auth.user.email}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${auth.token}`,
+          },
+        });
 
-      const data = await response.json();
-      if (data.success) {
-        setUserId(data.userId); // Set the user ID from the API response
-      } else {
-        alert(data.message || "Error fetching user ID");
+        const data = await response.json();
+        if (data.success) {
+          setUserId(data.userId);
+        } else {
+          setError(data.message || "Error fetching user ID");
+        }
+      } catch (err) {
+        setError("Failed to fetch user ID");
+        console.error(err);
       }
     };
-
-    console.log("USERID: ",userId);
 
     fetchUserId();
   }, [auth]);
@@ -36,56 +43,72 @@ export default function DashboardPage() {
     const fetchFiles = async () => {
       if (!userId) return;
 
-      console.log("ID:", userId);
+      setIsLoading(true);
+      setError(null);
 
+      try {
+        const response = await fetch(`/api/files/read-file?userId=${userId}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${auth.token}`,
+          },
+        });
 
-      const response = await fetch(`/api/files/read-file?userId=${userId}`, {
-        method: "GET",
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        setFiles(data.files);
-      } else {
-        alert(data.message || "Error fetching files");
+        const data = await response.json();
+        if (data.success) {
+          setFiles(data.files.map(file => ({
+            ...file,
+            dictionary: {
+              name: file.dictionaryName,
+              content: file.dictionaryFile,
+              type: file.dictionaryFile?.trim().startsWith("<") ? "xml" : "text"
+            }
+          })));
+        } else {
+          setError(data.message || "Error fetching files");
+        }
+      } catch (err) {
+        setError("Failed to fetch files");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchFiles();
-  }, [userId, auth.token]); // Fetch files when userId or token changes
+  }, [userId, auth.token]);
 
-  const handleView = (dictionary) => {
-    if (!dictionary || !dictionary.content) {
-      alert("❌ No dictionary content available.");
-    } else {
-      const isXml = dictionary.content.trim().startsWith("<");
-      const title = isXml ? "📄 XML View:" : "📄 Text View:";
-      alert(`${title}\n\n${dictionary.content}`);
+  const handleView = (fileId, dictionary) => {
+    if (!dictionary?.content) {
+      setError("No dictionary content available");
+      return;
     }
-  };
-  
-
-  const handleEdit = (id) => {
-    alert(`🛠️ Open editor for file ID: ${id}`);
+    
+    // Navigate to view page with dictionary data
+    router.push(`/view-dictionary?fileId=${fileId}`);
   };
 
   const handleDownload = (dictionary) => {
-    if (!dictionary || !dictionary.content || !dictionary.name) {
-      alert("❌ Invalid dictionary data.");
+    if (!dictionary?.content) {
+      setError("No dictionary content available");
       return;
     }
-  
-    const blob = new Blob([dictionary.content], {
-      type: "application/octet-stream",
+
+    const blob = new Blob([dictionary.content], { 
+      type: dictionary.type === "xml" ? "application/xml" : "text/plain" 
     });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${dictionary.name}.epf`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${dictionary.name || "dictionary"}.${dictionary.type === "xml" ? "xml" : "txt"}`;
+    document.body.appendChild(link);
+    link.click();
+
+    setTimeout(() => {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 0);
   };
-  
 
   const total = files.length;
   const success = files.filter((f) => f.status === "Success").length;
@@ -106,6 +129,28 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="flex-grow-1 p-4">
         <h2 className="display-5 fw-bold mb-4">📊 Dashboard</h2>
+
+        {/* Error Message */}
+        {error && (
+          <div className="alert alert-danger alert-dismissible fade show mb-4">
+            {error}
+            <button 
+              type="button" 
+              className="btn-close" 
+              onClick={() => setError(null)}
+              aria-label="Close"
+            ></button>
+          </div>
+        )}
+
+        {/* Loading Indicator */}
+        {isLoading && (
+          <div className="text-center my-4">
+            <div className="spinner-border text-success" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="row mb-4">
@@ -135,56 +180,64 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="table-responsive">
-          <table className="table table-bordered bg-white shadow-sm">
-            <thead className="table-success">
-              <tr>
-                <th>File Name</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {files.map((file) => (
-                <tr key={file._id}>
-                  <td>{file.fileName}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        file.status === "Success"
-                          ? "bg-success-subtle text-success-emphasis"
-                          : "bg-danger-subtle text-danger-emphasis"
-                      }`}
-                    >
-                      {file.status}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => handleView(file.dictionary)}
-                      className="btn btn-primary btn-sm me-2"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => handleEdit(file._id)}
-                      className="btn btn-warning btn-sm text-white me-2"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDownload(file.dictionary)}
-                      className="btn btn-success btn-sm"
-                    >
-                      Download
-                    </button>
-                  </td>
+        {/* Files Table */}
+        {files.length > 0 ? (
+          <div className="table-responsive">
+            <table className="table table-bordered bg-white shadow-sm">
+              <thead className="table-success">
+                <tr>
+                  <th>File Name</th>
+                  <th>Status</th>
+                  <th>Dictionary</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {files.map((file) => (
+                  <tr key={file._id}>
+                    <td>{file.fileName}</td>
+                    <td>
+                      <span
+                        className={`badge ${
+                          file.status === "Success"
+                            ? "bg-success-subtle text-success-emphasis"
+                            : "bg-danger-subtle text-danger-emphasis"
+                        }`}
+                      >
+                        {file.status}
+                      </span>
+                    </td>
+                    <td>
+                      {file.dictionary?.name || "N/A"}
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => handleView(file._id, file.dictionary)}
+                        className="btn btn-primary btn-sm me-2"
+                        disabled={!file.dictionary?.content}
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => handleDownload(file.dictionary)}
+                        className="btn btn-success btn-sm"
+                        disabled={!file.dictionary?.content}
+                      >
+                        Download
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          !isLoading && (
+            <div className="alert alert-info">
+              No files found. Upload some files to get started!
+            </div>
+          )
+        )}
       </main>
     </div>
   );
