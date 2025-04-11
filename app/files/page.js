@@ -119,7 +119,7 @@ const Page = () => {
           dbFormData.append("userId", userId);
           dbFormData.append("status", "Failed");
           
-          await fetch("/api/auth/write-file", {
+          await fetch("/api/files/write-file", {
             method: "POST",
             body: dbFormData,
           });
