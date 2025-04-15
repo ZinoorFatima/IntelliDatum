@@ -3,18 +3,20 @@
 import React, { useState ,useEffect} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import emailjs from 'emailjs-com'; // Import EmailJS
-
+import Swal from "sweetalert2";
 export default function ContactUs() {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
+  const [status, setStatus] = useState({ message: '', type: '' });
 
   useEffect(() => {
     // This logic will only run on the client-side
     const authData = localStorage.getItem("authData");
-
+    setStatus({ message: '', type: '' });
     if (authData) {
       console.log("Authentication data:", authData);
     } else {
@@ -32,7 +34,7 @@ export default function ContactUs() {
 
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent default form submission
-
+    setIsLoading(true);
     // Use EmailJS to send the email
     emailjs
       .send(
@@ -44,14 +46,27 @@ export default function ContactUs() {
       .then(
         (response) => {
           console.log('SUCCESS!', response.status, response.text);
-          alert('Message sent successfully!');
+          Swal.fire({
+            icon: 'success',
+            text: data.message || 'Message Sent Successfully!',
+            confirmButtonColor: '#198754',
+          });
           setFormData({ name: '', email: '', message: '' }); // Clear the form
         },
         (err) => {
           console.error('FAILED...', err);
           alert('Failed to send message. Please try again.');
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: "Failed to send Message. Please try again"|| 'Something went wrong.',
+            confirmButtonColor: '#d33',
+          });
         }
-      );
+      ).finally(() => {
+        setIsLoading(false); 
+      });
+      
   };
 
   return (
@@ -159,9 +174,11 @@ export default function ContactUs() {
                 ></textarea>
               </div>
 
+
               <div className="text-center">
                 <button
                   type="submit"
+                  disabled={isLoading}
                   className="btn btn-light mt-2 py-2 px-4 fw-medium shadow"
                   style={{
                     borderRadius: '8px',
@@ -169,7 +186,18 @@ export default function ContactUs() {
                     minWidth: '150px'
                   }}
                 >
-                  Send
+                {isLoading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    Sending...
+                  </>
+                ) : (
+                  "Send"
+                )}
                 </button>
               </div>
             </form>

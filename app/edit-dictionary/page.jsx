@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/auth.js";
-
+import Swal
+  from "sweetalert2";
 export default function EditDictionaryPage() {
   const [fileId, setFileId] = useState(null);
   const { token } = useAuth()[0];
@@ -44,10 +45,22 @@ export default function EditDictionaryPage() {
           setContent(file.dictionaryFile);
         } else {
           setError("Failed to load dictionary.");
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: 'Failed to load dictionary',
+            confirmButtonColor: '#d33',
+          });
         }
       } catch (err) {
         console.error(err);
-        setError("Error loading dictionary.");
+        setError("Failed to load dictionary.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: 'Failed to load dictionary',
+          confirmButtonColor: '#d33',
+        });
       } finally {
         setLoading(false);
       }
@@ -75,11 +88,24 @@ export default function EditDictionaryPage() {
       if (data.success) {
         router.push("/dashboard");
       } else {
-        setError(data.message || "Failed to save dictionary.");
+        setError("Failed to load dictionary.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: 'Failed to save to dictionary',
+          confirmButtonColor: '#d33',
+        });
       }
     } catch (err) {
       console.error(err);
       setError("Error saving dictionary.");
+      ;
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: 'Failed to save to dictionary',
+        confirmButtonColor: '#d33',
+      });
     } finally {
       setSaving(false);
     }
@@ -90,8 +116,6 @@ export default function EditDictionaryPage() {
   return (
     <div className="container py-5">
       <h2 className="mb-4">📝 Edit Dictionary - {dictionary?.name}</h2>
-
-      {error && <div className="alert alert-danger">{error}</div>}
 
       <textarea
         className="form-control mb-3"

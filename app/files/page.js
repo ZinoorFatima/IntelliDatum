@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
-
+import Swal from "sweetalert2";
 const Page = () => {
   const [auth] = useAuth();
 
@@ -29,6 +29,12 @@ const Page = () => {
         setUserId(data.userId);
       } catch (err) {
         console.error("Failed to fetch user ID:", err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: 'Failed to fetch user ID' || 'Something went wrong.',
+          confirmButtonColor: '#d33',
+        });
       }
     };
 
@@ -65,9 +71,9 @@ const Page = () => {
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
-
+      console.log("starting processs")
       // Send to external processing API
-      const externalRes = await fetch(`${process.env.BACKEND_API}/process`, {
+      const externalRes = await fetch(`http://127.0.0.1:5000/process`, {
         method: "POST",
         body: formData,
         headers: {
@@ -75,11 +81,51 @@ const Page = () => {
         },
       });
 
-      if (!externalRes.ok) throw new Error(`Processing failed: ${externalRes.status}`);
-      const externalData = await externalRes.json();
 
-      setProcessedText(externalData.content || externalData.message);
+
+      // Check for errors first
+      if (!externalRes.ok) throw new Error(`Processing failed: ${externalRes.status}`);
+
+      // Process the stream
+      const reader = externalRes.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let finalOutput = "";
+      let result = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n\n");
+
+        for (let line of lines) {
+          if (line.startsWith("data: ")) {
+            const data = line.replace("data: ", "").trim();
+
+            // Check for "Final result" tag
+            if (data.startsWith("Final result:base64")) {
+              const encoded = data.replace("Final result:base64:", "").trim();
+              const decoded = atob(encoded);
+              finalOutput = decoded;
+            } else {
+              // Update progress display or store it if needed
+              result = data;
+              // Optionally show in UI: e.g., setProgress(data)
+              setFileDetails(prev => ({
+                ...prev,
+                status: result
+              }));
+
+            }
+          }
+        }
+      }
+
+      // After stream finishes, set final output
+      setProcessedText(finalOutput || result); // fallback to progress if no final result
       setFileDetails((prev) => ({ ...prev, status: "Completed" }));
+
 
       // Save to DB if user is logged in
       if (userId) {
@@ -87,7 +133,7 @@ const Page = () => {
         dbFormData.append("file", selectedFile);
         dbFormData.append("userId", userId);
         dbFormData.append("status", "Success"); // Set status based on processing success
-        
+
         // Only include dictionary if processing was successful
         if (externalData.content) {
           const dictionaryBlob = new Blob([externalData.content], { type: "text/plain" });
@@ -127,7 +173,7 @@ const Page = () => {
           for (let [key, value] of dbFormData.entries()) {
             console.log(`${key}:`, value);
           }
-          
+
           await fetch("/api/files/write-file", {
             method: "POST",
             body: dbFormData,

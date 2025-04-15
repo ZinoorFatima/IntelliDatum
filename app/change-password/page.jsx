@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/auth";
 import { useRouter } from "next/navigation";
-
+import Swal from "sweetalert2";
 export default function ChangePassword() {
   const [auth] = useAuth();
   const router = useRouter();
@@ -76,9 +76,20 @@ export default function ChangePassword() {
 
     if (res.ok && data.success) {
       setSuccess("Password changed successfully!");
+      Swal.fire({
+        icon: 'success',
+        text: data.message || "Password changed successfully!",
+        confirmButtonColor: '#198754',
+      });
       setTimeout(() => router.push("/profile"), 2000);
     } else {
       setError(data.message || "Something went wrong.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: data.message || "something went wrong",
+        confirmButtonColor: '#d33',
+      });
     }
   };
 
@@ -89,10 +100,6 @@ export default function ChangePassword() {
           <div className="card shadow-sm border-0 bg-light ">
             <div className="card-body p-5">
               <h2 className="text-center mb-4">Change Password</h2>
-
-              {error && <div className="alert alert-danger">{error}</div>}
-              {success && <div className="alert alert-success">{success}</div>}
-
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label fw-bold">Current Password</label>

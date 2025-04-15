@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 import { useRouter } from "next/navigation";
-
+import Swal from "sweetalert2";
 export default function DashboardPage() {
   const [auth] = useAuth();
   const router = useRouter();
@@ -29,6 +29,12 @@ export default function DashboardPage() {
           setUserId(data.userId);
         } else {
           setError(data.message || "Error fetching user ID");
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: error || 'Something went wrong.',
+            confirmButtonColor: '#d33',
+          });
         }
       } catch (err) {
         setError("Failed to fetch user ID");
@@ -65,10 +71,22 @@ export default function DashboardPage() {
             }
           })));
         } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: data.message || 'Something went wrong.',
+            confirmButtonColor: '#d33',
+          });
           setError(data.message || "Error fetching files");
         }
       } catch (err) {
         setError("Failed to fetch files");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: data.message || 'Something went wrong.',
+          confirmButtonColor: '#d33',
+        });
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -81,9 +99,15 @@ export default function DashboardPage() {
   const handleView = (fileId, dictionary) => {
     if (!dictionary?.content) {
       setError("No dictionary content available");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: error || 'Something went wrong.',
+        confirmButtonColor: '#d33',
+      });
       return;
     }
-    
+
     // Navigate to view page with dictionary data
     router.push(`/view-dictionary?fileId=${fileId}`);
   };
@@ -94,8 +118,8 @@ export default function DashboardPage() {
       return;
     }
 
-    const blob = new Blob([dictionary.content], { 
-      type: dictionary.type === "xml" ? "application/xml" : "text/plain" 
+    const blob = new Blob([dictionary.content], {
+      type: dictionary.type === "xml" ? "application/xml" : "text/plain"
     });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -134,9 +158,9 @@ export default function DashboardPage() {
         {error && (
           <div className="alert alert-danger alert-dismissible fade show mb-4">
             {error}
-            <button 
-              type="button" 
-              className="btn-close" 
+            <button
+              type="button"
+              className="btn-close"
               onClick={() => setError(null)}
               aria-label="Close"
             ></button>
@@ -198,11 +222,10 @@ export default function DashboardPage() {
                     <td>{file.fileName}</td>
                     <td>
                       <span
-                        className={`badge ${
-                          file.status === "Success"
-                            ? "bg-success-subtle text-success-emphasis"
-                            : "bg-danger-subtle text-danger-emphasis"
-                        }`}
+                        className={`badge ${file.status === "Success"
+                          ? "bg-success-subtle text-success-emphasis"
+                          : "bg-danger-subtle text-danger-emphasis"
+                          }`}
                       >
                         {file.status}
                       </span>

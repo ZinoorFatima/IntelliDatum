@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 import Image from "next/image";
 import Link from "next/link";
-
+import Swal from "sweetalert2";
 export default function ProfilePage() {
   const [auth] = useAuth();
   const user = auth?.user;

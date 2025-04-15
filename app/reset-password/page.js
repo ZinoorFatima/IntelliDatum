@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -51,23 +52,41 @@ export default function ResetPasswordPage() {
 
       if (res.ok) {
         setStatus({ message: data.message, type: 'success' });
-
+        Swal.fire({
+          icon: 'success',
+          text: data.message || 'Reset Token Sent!',
+          confirmButtonColor: '#198754',
+        });
         // Wait 2 seconds and then redirect to login
         setTimeout(() => {
           router.push('/signin');
         }, 500);
       } else {
         setStatus({ message: data.message, type: 'danger' });
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: data.message || 'Something went wrong.',
+          confirmButtonColor: '#d33',
+        });
       }
     } catch (error) {
       console.error("Error during Resetting Password:", error, status);
       setStatus({ message: 'Something went wrong!', type: 'danger' });
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: data.message || 'Something went wrong.',
+        confirmButtonColor: '#d33',
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
+
+    
     <div
       className="d-flex flex-column min-vh-100"
       style={{
@@ -77,6 +96,7 @@ export default function ResetPasswordPage() {
         padding: '2rem',
       }}
     >
+      
       <div
         style={{
           maxWidth: '60%',
@@ -103,6 +123,7 @@ export default function ResetPasswordPage() {
             required
             style={{ width: '80%', margin: 'auto' }}
           />
+          
 
           <input
             type="text"
@@ -133,6 +154,7 @@ export default function ResetPasswordPage() {
               {showPassword ? '🙈' : '👁'}
             </button>
           </div>
+          
 
           <button
             type="submit"

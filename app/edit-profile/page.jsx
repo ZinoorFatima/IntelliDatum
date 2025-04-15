@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 import { useRouter } from "next/navigation";
-
+import Swal from "sweetalert2";
 export default function EditProfile() {
   const [auth, setAuth] = useAuth();
   const [form, setForm] = useState({ FirstName: "", LastName: "" });
@@ -59,7 +59,12 @@ export default function EditProfile() {
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("An error occurred while updating your profile.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: "An error occurred while updating your profile." || 'Something went wrong.',
+        confirmButtonColor: '#d33',
+      });
     } finally {
       setLoading(false); // Set loading to false once the update is done
     }
