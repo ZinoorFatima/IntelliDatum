@@ -10,7 +10,7 @@ export default function EditDictionaryPage() {
   const { token } = useAuth()[0];
   const router = useRouter();
 
-  const [dictionaryXml, setDictionaryXml] = useState("");
+  //const [dictionaryXml, setDictionaryXml] = useState("");
   const [fileContent, setFileContent] = useState("");
   const [fileName, setFileName] = useState("");
   const [dictionaryName, setDictionaryName] = useState("");
@@ -29,8 +29,6 @@ export default function EditDictionaryPage() {
       const fieldMatch = line.match(/<field name="([^"]+)" type="([^"]+)"(.*?)\/>/);
       const recordMatch = line.match(/<record name="([^"]+)" id="([^"]+)"\s*>/);
       const separatorMatch = line.match(/<field-info separator="(.+?)"/);
-
-      console.log(dictionaryXml);
 
       if (separatorMatch) {
         setDelimiter(separatorMatch[1]);
@@ -63,7 +61,7 @@ export default function EditDictionaryPage() {
     });
 
     setParsedLines(lines);
-  }, [dictionaryXml]);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -86,7 +84,7 @@ export default function EditDictionaryPage() {
           const dictionary = file.dictionaryFile || "";
           const content = file.fileContent || "";
 
-          setDictionaryXml(dictionary);
+          //setDictionaryXml(dictionary);
           setFileContent(content);
           setFileName(file.fileName || "File");
           setDictionaryName(file.dictionaryName || "Dictionary");
@@ -241,22 +239,25 @@ export default function EditDictionaryPage() {
         {/* Editable Dictionary */}
         <div className="col-md-6 mb-4">
           <h6 className="text-muted mb-2">{dictionaryName}</h6>
-          <pre className="bg-light p-3 rounded" style={{ maxHeight: "70vh", overflowY: "auto" }}>
+          <div
+            className="bg-light p-3 rounded"
+            style={{ maxHeight: "70vh", overflowY: "auto", fontFamily: "monospace", whiteSpace: "pre-wrap" }}
+          >
             {parsedLines.map((line, i) => {
               if (line.type === "record") {
                 return (
-                  <div key={i} className="d-flex align-items-center gap-2 mb-2">
+                  <div key={i} className="d-flex flex-wrap align-items-center gap-2 mb-2">
                     <span className="text-muted">&lt;record name=&quot;</span>
                     <input
                       type="text"
                       value={line.recordName}
                       onChange={(e) => handleFieldChange(line.index, "recordName", e.target.value)}
-                      className="form-control form-control-sm"
-                      style={{ width: "25%" }}
+                      className="form-control form-control-sm flex-grow-1"
+                      style={{ minWidth: "100px", maxWidth: "200px" }}
                     />
-                    <span className="text-muted">{"\" id=\""}</span>
+                    <span className="text-muted">&quot; id=&quot;</span>
                     <span className="text-muted">{line.recordId}</span>
-                    <span className="text-muted">{"\">"}</span>
+                    <span className="text-muted">&quot;&gt;</span>
                   </div>
                 );
               } else if (line.type === "field") {
@@ -265,7 +266,7 @@ export default function EditDictionaryPage() {
                   .findIndex((f) => f.index === line.index);
 
                 return (
-                  <div key={i} className="d-flex align-items-center gap-2 mb-1">
+                  <div key={i} className="d-flex flex-wrap align-items-center gap-2 mb-2">
                     <span className="text-muted">&lt;field name=&quot;</span>
                     <input
                       type="text"
@@ -276,16 +277,16 @@ export default function EditDictionaryPage() {
                         setCurrentRecordId(findCurrentRecordId(line.index));
                       }}
                       onBlur={() => setHighlightIndex(null)}
-                      className="form-control form-control-sm"
-                      style={{ width: "25%" }}
+                      className="form-control form-control-sm flex-grow-1"
+                      style={{ minWidth: "100px", maxWidth: "200px" }}
                     />
-                    <span className="text-muted">&quot; type=</span>
+                    <span className="text-muted">&quot; type=&quot;</span>
                     <input
                       type="text"
                       value={line.fieldType}
                       onChange={(e) => handleFieldChange(line.index, "fieldType", e.target.value)}
-                      className="form-control form-control-sm"
-                      style={{ width: "20%" }}
+                      className="form-control form-control-sm flex-grow-1"
+                      style={{ minWidth: "100px", maxWidth: "200px" }}
                     />
                     <span className="text-muted">&quot;{line.rest} /&gt;</span>
                   </div>
@@ -294,7 +295,7 @@ export default function EditDictionaryPage() {
                 return <div key={i}>{line.content}</div>;
               }
             })}
-          </pre>
+          </div>
         </div>
 
         {/* Read-only File Content with highlighting */}

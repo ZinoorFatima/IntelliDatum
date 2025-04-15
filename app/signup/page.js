@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
@@ -106,173 +105,123 @@ const SignUp = () => {
 
   return (
     <div
+      className="bg-success"
       style={{
-        backgroundColor: '#198754',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         height: '100%',
       }}
     >
-      <div style={{ maxWidth: '80%', width: '100%', display: 'flex', margin: '20px auto' }}>
-        <div style={{ width: '30%', backgroundColor: '#f0f0f0', borderBottomLeftRadius: '20px', borderTopLeftRadius: '20px' }}>
-          <Image
-            src="/MistyHills.png"
-            alt="Logo 1"
-            width={150}
-            height={150}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              borderBottomLeftRadius: '20px',
-              borderTopLeftRadius: '20px',
-            }}
+      <div
+        style={{
+          maxWidth: '60%',
+          width: '100%',
+          margin: '20px auto',
+          padding: '6%',
+          border: '1px solid #ccc',
+          borderRadius: '20px',
+          backgroundColor: '#fff',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <h2 style={{ textAlign: 'center', marginBottom: '8%' }}>Create Account</h2>
+
+        <div style={{ width: '100%', marginBottom: '5%', textAlign: 'center' }}>
+          <input
+            type="text"
+            placeholder="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            style={{ width: '80%', padding: '8px' }}
+            required
           />
         </div>
-        <div
-          style={{
-            width: '70%',
-            padding: '6%',
-            border: '1px solid #ccc',
-            borderBottomRightRadius: '20px',
-            borderTopRightRadius: '20px',
-            backgroundColor: '#E5E9D2',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <h2 style={{ textAlign: 'center', marginBottom: '10%' }}>Create Account</h2>
 
-          <div style={{ marginBottom: '5%', width: '100%', textAlign: 'center' }}>
-            <input
-              type="name"
-              id="Firstname"
-              name="Firstname"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              style={{
-                width: '80%',
-                padding: '8px',
-                boxSizing: 'border-box',
-              }}
-              placeholder="First Name"
-              required
-            />
-          </div>
-          <div style={{ marginBottom: '5%', width: '100%', textAlign: 'center' }}>
-            <input
-              type="name"
-              id="Lastname"
-              name="Lastname"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              style={{
-                width: '80%',
-                padding: '8px',
-                boxSizing: 'border-box',
-              }}
-              placeholder="Last Name"
-              required
-            />
-          </div>
+        <div style={{ width: '100%', marginBottom: '5%', textAlign: 'center' }}>
+          <input
+            type="text"
+            placeholder="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            style={{ width: '80%', padding: '8px' }}
+            required
+          />
+        </div>
 
-          <div style={{ marginBottom: '5%', width: '100%', textAlign: 'center' }}>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                width: '80%',
-                padding: '8px',
-                boxSizing: 'border-box',
-              }}
-              placeholder="Email"
-              required
-            />
-          </div>
+        <div style={{ width: '100%', marginBottom: '5%', textAlign: 'center' }}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ width: '80%', padding: '8px' }}
+            required
+          />
+        </div>
 
-          {/* Phone Input */}
-          <div style={{ marginBottom: '5%', width: '100%', textAlign: 'center' }}>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              style={{
-                width: '80%',
-                padding: '8px',
-                boxSizing: 'border-box',
-              }}
-              placeholder="Phone"
-              required
-            />
-          </div>
+        <div style={{ width: '100%', marginBottom: '5%', textAlign: 'center' }}>
+          <input
+            type="tel"
+            placeholder="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            style={{ width: '80%', padding: '8px' }}
+            required
+          />
+        </div>
 
-          {/* Password with Eye */}
-          <div style={{ marginBottom: "5%", width: "100%", textAlign: "center", position: "relative" }}>
-            <input
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                width: "80%",
-                padding: "8px",
-                paddingRight: "40px",
-                boxSizing: "border-box",
-              }}
-              placeholder="Password"
-              required
-            />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position: "absolute",
-                right: "12%",
-                top: "50%",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
-                fontSize: "18px",
-              }}
-            >
-              {showPassword ? "🙈" : "👁"}
-            </span>
-          </div>
-
+        <div style={{ marginBottom: '5%', width: '80%', position: 'relative', margin: '0 auto' }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ width: '100%', padding: '8px 40px 8px 8px' }}
+            required
+          />
           <button
-            type="submit"
-            onClick={handleNavigation}
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
             style={{
-              width: '80%',
-              padding: '10px',
-              backgroundColor: '#198754',
-              color: 'white',
+              position: 'absolute',
+              right: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'transparent',
               border: 'none',
-              borderRadius: '30px',
+              fontSize: '20px',
               cursor: 'pointer',
-              marginBottom: '10%',
             }}
-            disabled={loading} // Disable button when loading
           >
-            {loading ? 'Creating account...' : 'Create'}
+            {showPassword ? '🙈' : '👁'}
           </button>
+        </div>
 
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexDirection: 'row',
-            gap: '5px',
-          }}>
-            <div>Already have an account?</div>
-            <Link href="/signin" style={{
-              color: 'black'
-            }}>Login</Link>
-          </div>
+        <button
+          type="submit"
+          onClick={handleNavigation}
+          style={{
+            width: '80%',
+            padding: '10px',
+            backgroundColor: '#198754',
+            color: 'white',
+            border: 'none',
+            borderRadius: '30px',
+            cursor: 'pointer',
+            marginBottom: '10%',
+            marginTop: '5%',
+          }}
+          disabled={loading}
+        >
+          {loading ? 'Creating account...' : 'Create Account'}
+        </button>
+
+        <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+          <div>Already have an account?</div>
+          <Link href="/signin" style={{ color: 'black' }}>Login</Link>
         </div>
       </div>
     </div>

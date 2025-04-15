@@ -44,7 +44,7 @@ const Signin = () => {
         localStorage.setItem("auth", JSON.stringify({ user: result.user, token: result.token }));
         router.push("/");
       } else {
-        alert(result.message || "Login failed");
+        alert("Invalid Credentials");
       }
     } catch (error) {
       console.error("Error during Login:", error);
@@ -63,6 +63,7 @@ const Signin = () => {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100%',
+        width: '100%'
       }}
     >
       <div

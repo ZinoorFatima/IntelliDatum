@@ -68,7 +68,7 @@ export default function Home() {
                 alt="Hero Illustration"
                 width={800}
                 height={600}
-                style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+                style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }}
               />
             </div>
           </div>
@@ -103,10 +103,10 @@ export default function Home() {
 
       {/* Features Section */}
       <div className="container py-5">
-        <h2 className="text-success fw-bold text-center mb-5">Features</h2>
+      <h2 className="text-success fw-bold text-center md:mb-5">Features</h2>
         <div className="row g-4">
           {features.map((feature, idx) => (
-            <div className="col-12 col-md-6 col-lg-4" key={idx}>
+            <div className="col-12 col-md-6 col-lg-4 mb-5" key={idx}>
               <div className="text-center mb-3">
                 <Image
                   src={feature.img}
@@ -116,7 +116,7 @@ export default function Home() {
                   style={{ objectFit: 'contain' }}
                 />
               </div>
-              <div className="bg-light text-success p-4 rounded shadow border border-success"
+              <div className="bg-light text-success p-4 rounded border border-success"
                 style={{ boxShadow: '0 0 10px rgba(25, 135, 84, 0.3)' }}>
                 <h5 className="fw-bold">{feature.title}</h5>
                 <p className="mb-0">{feature.desc}</p>

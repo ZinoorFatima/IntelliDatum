@@ -3,6 +3,7 @@ html, body {
   height: 100%;
   padding: 0;
   margin: 0;
+  overflow-x: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -77,6 +78,25 @@ code {
   text-decoration: none;
   border-radius: 5px;
   text-align: center;
+}
+
+/* Dropdown animation */
+.animate-dropdown {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: block !important; /* Let Bootstrap handle visibility */
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1050;
+}
+
+/* When Bootstrap adds .show to the dropdown */
+.animate-dropdown.show {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  pointer-events: auto;
 }
 
 

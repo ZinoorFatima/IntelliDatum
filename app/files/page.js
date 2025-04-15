@@ -5,6 +5,7 @@ import { useAuth } from "../context/auth";
 import Swal from "sweetalert2";
 import { CloudArrowUpIcon } from "@heroicons/react/24/solid";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Download } from "lucide-react";
 
 const Page = () => {
   const [auth] = useAuth();
@@ -104,6 +105,7 @@ const Page = () => {
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
+
 
       const externalRes = await fetch(`${process.env.BACKEND_API}/process`, {
 
@@ -231,6 +233,20 @@ const Page = () => {
     }
   };
 
+  const handleDownload = () => {
+    const blob = new Blob([processedText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `processed_${fileDetails.name}`;
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 0);
+  };
+
   return (
     <div className="bg-success-subtle min-vh-100 py-5 text-dark">
       <div className="container">
@@ -278,12 +294,12 @@ const Page = () => {
               <div className="row fw-bold border-bottom pb-2 mb-3 text-success">
                 <div className="col">File Name</div>
                 <div className="col">Size</div>
-                <div className="col">Status</div>
+                <div className="col d-flex align-items-center gap-2">Status</div>
               </div>
-              <div className="row">
+              <div className="row align-items-center">
                 <div className="col">{fileDetails.name}</div>
                 <div className="col">{fileDetails.size}</div>
-                <div className="col">
+                <div className="col d-flex align-items-center justify-content-between">
                   <span className={`fw-semibold ${fileDetails.status === "Processed"
                     ? "text-success"
                     : fileDetails.status === "Failed"
@@ -292,33 +308,32 @@ const Page = () => {
                     }`}>
                     {fileDetails.status}
                   </span>
+
+                  {/* Download button styled and aligned right */}
+                  {fileDetails.status === "Processed" && processedText && (
+                    <button
+                      className="btn btn-success btn-sm d-flex align-items-center gap-1"
+                      onClick={handleDownload}
+                      title="Download Processed File"
+                    >
+                      <Download size={16} />
+                      Download
+                    </button>
+                  )}
                 </div>
               </div>
+
             </div>
           </div>
         )}
 
-        {/* Download Button */}
+        {/* Preview */}
         {processedText && (
           <div className="text-center mt-5">
-            <button
-              className="btn btn-info text-white fw-semibold px-4 py-2"
-              onClick={() => {
-                const blob = new Blob([processedText], { type: "text/plain" });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = `processed_${fileDetails.name}`;
-                document.body.appendChild(link);
-                link.click();
-                setTimeout(() => {
-                  document.body.removeChild(link);
-                  URL.revokeObjectURL(url);
-                }, 0);
-              }}
-            >
-              Download Processed Data
-            </button>
+            <div style={{ marginTop: "20px", padding: "15px", backgroundColor: "#f8f9fa", borderRadius: "5px", border: "1px solid #ddd", maxHeight: "200px", overflowY: "auto" }}>
+              <h4>Preview</h4>
+              <pre style={{ whiteSpace: "pre-wrap", margin: 0 }}>{processedText}</pre>
+            </div>
           </div>
         )}
       </div>
