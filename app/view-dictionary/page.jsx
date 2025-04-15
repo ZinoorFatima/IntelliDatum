@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Pencil, Download } from "lucide-react";
 
 export default function ViewDictionaryPage() {
   const router = useRouter();
@@ -29,7 +30,8 @@ export default function ViewDictionaryPage() {
           setError(data.message || "Failed to load dictionary");
         }
       } catch (err) {
-        setError("Failed to fetch dictionary", err);
+        setError("Failed to fetch dictionary");
+        console.error(err);
       } finally {
         setIsLoading(false);
       }
@@ -69,18 +71,29 @@ export default function ViewDictionaryPage() {
 
   return (
     <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h1>Dictionary: {dictionary.name}</h1>
-        <div>
-          <button className="btn btn-warning me-2" onClick={handleEdit}>
-            Edit
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-3">
+        <h1 className="h4 m-0 text-success">{dictionary.name}</h1>
+        <div className="d-flex gap-2">
+          <button
+            className="btn btn-outline-success d-flex align-items-center"
+            onClick={handleEdit}
+            title="Edit Dictionary"
+          >
+            <Pencil size={18} />
           </button>
-          <button className="btn btn-primary" onClick={handleDownload}>
-            Download
+          <button
+            className="btn btn-outline-primary d-flex align-items-center"
+            onClick={handleDownload}
+            title="Download Dictionary"
+          >
+            <Download size={18} />
           </button>
         </div>
       </div>
-      <pre className="bg-light p-3 rounded">{dictionary.content}</pre>
+
+      <pre className="bg-light p-3 rounded" style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>
+        {dictionary.content}
+      </pre>
     </div>
   );
 }

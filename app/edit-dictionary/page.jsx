@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Save } from "lucide-react";
 import { useAuth } from "../context/auth.js";
 
 export default function EditDictionaryPage() {
@@ -10,11 +11,13 @@ export default function EditDictionaryPage() {
 
   const [dictionaryXml, setDictionaryXml] = useState("");
   const [fileContent, setFileContent] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [dictionaryName, setDictionaryName] = useState("");
+
   const [parsedLines, setParsedLines] = useState([]);
   const [highlightIndex, setHighlightIndex] = useState(null);
   const [delimiter, setDelimiter] = useState(null);
   const [currentRecordId, setCurrentRecordId] = useState(null);
-
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,6 +46,9 @@ export default function EditDictionaryPage() {
 
           setDictionaryXml(dictionary);
           setFileContent(content);
+          setFileName(file.fileName || "File");
+          setDictionaryName(file.dictionaryName || "Dictionary");
+
           parseDictionaryXml(dictionary);
         } else {
           setError("Failed to load dictionary.");
@@ -67,9 +73,6 @@ export default function EditDictionaryPage() {
     }
     return null;
   };
-  
-
-  
 
   const parseDictionaryXml = (xml) => {
     const lines = xml.split("\n").map((line, index) => {
@@ -165,22 +168,14 @@ export default function EditDictionaryPage() {
   const renderHighlightedFileContent = () => {
     if (!delimiter || highlightIndex === null || currentRecordId === null) return fileContent;
 
-    //console.log("FILE INDEX: ",delimiter, highlightIndex, currentRecordId);
-  
     const lines = fileContent.split("\n");
-    const dictionaryFields = parsedLines.filter(l => l.type === "field");
+    const dictionaryFields = parsedLines.filter((l) => l.type === "field");
     const targetField = dictionaryFields[highlightIndex];
     const fieldIdx = parseInt(targetField?.rest.match(/index="(\d+)"/)?.[1]);
-    //console.log("FIELD INDEX: ",fieldIdx, targetField);
-
     if (isNaN(fieldIdx)) return fileContent;
-  
+
     return lines.map((line) => {
       const parts = line.split(delimiter);
-
-      //console.log("PARTS: ", parts[0], currentRecordId); //PARTS: "50001" 50001
-  
-      // Check if the first field (record id) matches the selected recordId
       if (parts[0].replace(/^"|"$/g, "") === currentRecordId && parts.length > fieldIdx) {
         return parts
           .map((part, idx) =>
@@ -193,19 +188,30 @@ export default function EditDictionaryPage() {
       return line;
     }).join("\n");
   };
-  
 
   if (loading) return <div className="p-4 min-vh-100">Loading...</div>;
 
   return (
-    <div className="container py-5">
-      <h2 className="mb-4">📝 Edit Dictionary</h2>
+    <div className="container py-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2 className="m-0 text-success">Dictionary Editor</h2>
+        <button
+          onClick={handleSave}
+          className="btn btn-success d-flex align-items-center"
+          disabled={saving}
+          title="Save Changes"
+        >
+          <Save size={18} className="me-1" />
+          <span className="d-none d-md-inline">{saving ? "Saving..." : "Save"}</span>
+        </button>
+      </div>
+
       {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="row">
-        {/* Editable Dictionary (left) */}
-        <div className="col-md-6">
-          <h5>📚 Dictionary</h5>
+        {/* Editable Dictionary */}
+        <div className="col-md-6 mb-4">
+          <h6 className="text-muted mb-2">{dictionaryName}</h6>
           <pre className="bg-light p-3 rounded" style={{ maxHeight: "70vh", overflowY: "auto" }}>
             {parsedLines.map((line, i) => {
               if (line.type === "record") {
@@ -262,9 +268,9 @@ export default function EditDictionaryPage() {
           </pre>
         </div>
 
-        {/* Read-only File Content (right) with highlighting */}
-        <div className="col-md-6">
-          <h5>📄 Original File</h5>
+        {/* Read-only File Content with highlighting */}
+        <div className="col-md-6 mb-4">
+          <h6 className="text-muted mb-2">{fileName}</h6>
           <div
             className="form-control"
             style={{
@@ -277,14 +283,6 @@ export default function EditDictionaryPage() {
           />
         </div>
       </div>
-
-      <button
-        onClick={handleSave}
-        className="btn btn-success mt-4"
-        disabled={saving}
-      >
-        {saving ? "Saving..." : "Save Changes"}
-      </button>
     </div>
   );
 }
