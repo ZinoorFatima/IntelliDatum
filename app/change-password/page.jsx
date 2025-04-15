@@ -34,7 +34,7 @@ export default function ChangePassword() {
       const parsed = JSON.parse(storedAuth);
       setAuth(parsed);
     }
-  }, []);
+  }, [router, setAuth]);
 
   useEffect(() => {
     if (user) {
@@ -110,7 +110,7 @@ export default function ChangePassword() {
         {success && <div className="alert alert-success">{success}</div>}
 
         <form onSubmit={handleSubmit}>
-          {["currentPassword", "newPassword", "confirmPassword"].map((field, idx) => {
+          {["currentPassword", "newPassword", "confirmPassword"].map((field) => {
             const labelMap = {
               currentPassword: "Current Password",
               newPassword: "New Password",

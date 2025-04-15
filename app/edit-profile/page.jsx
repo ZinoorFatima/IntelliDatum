@@ -10,7 +10,7 @@ export default function EditProfile() {
   const [loading, setLoading] = useState(false);
   const [loadingUser, setLoadingUser] =useState(true);
   const router = useRouter();
-  const [authChecked, setAuthChecked] = useState(false);
+  //const [authChecked, setAuthChecked] = useState(false);
 
 useEffect(() => {
     const storedAuth = localStorage.getItem("auth");
@@ -20,7 +20,7 @@ useEffect(() => {
       const parsed = JSON.parse(storedAuth);
       setAuth(parsed);
     }
-  }, []);
+  }, [router, setAuth]);
 
   useEffect(() => {
     if (auth?.user) {

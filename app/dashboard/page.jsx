@@ -33,7 +33,7 @@ export default function DashboardPage() {
         setAuth(parsed);
         setAuthChecked(true); 
       }
-    }, []);
+    }, [router, setAuth]);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -52,7 +52,7 @@ export default function DashboardPage() {
         if (data.success) setUserId(data.userId);
         else console.log("Error fetching user ID");
       } catch (err) {
-        console.log("Failed to fetch user ID");
+        console.log("Failed to fetch user ID", err);
       }
     };
 
@@ -97,7 +97,7 @@ export default function DashboardPage() {
           console.log("Error fetching files");
         }
       } catch (err) {
-        console.log("Failed to fetch files");
+        console.log("Failed to fetch files", err);
       } finally {
         setIsLoading(false);
       }
@@ -149,7 +149,7 @@ export default function DashboardPage() {
         console.log("Failed to delete file");
       }
     } catch (err) {
-      console.log("Error deleting file");
+      console.log("Error deleting file", err);
     }
   };
 

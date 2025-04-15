@@ -68,7 +68,7 @@ export default function Home() {
                 alt="Hero Illustration"
                 width={800}
                 height={600}
-                style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+                style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }}
               />
             </div>
           </div>

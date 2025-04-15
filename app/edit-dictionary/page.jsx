@@ -9,7 +9,7 @@ export default function EditDictionaryPage() {
   const { token } = useAuth()[0];
   const router = useRouter();
 
-  const [dictionaryXml, setDictionaryXml] = useState("");
+  //const [dictionaryXml, setDictionaryXml] = useState("");
   const [fileContent, setFileContent] = useState("");
   const [fileName, setFileName] = useState("");
   const [dictionaryName, setDictionaryName] = useState("");
@@ -83,7 +83,7 @@ export default function EditDictionaryPage() {
           const dictionary = file.dictionaryFile || "";
           const content = file.fileContent || "";
 
-          setDictionaryXml(dictionary);
+          //setDictionaryXml(dictionary);
           setFileContent(content);
           setFileName(file.fileName || "File");
           setDictionaryName(file.dictionaryName || "Dictionary");
@@ -220,7 +220,7 @@ export default function EditDictionaryPage() {
               if (line.type === "record") {
                 return (
                   <div key={i} className="d-flex flex-wrap align-items-center gap-2 mb-2">
-                    <span className="text-muted">&lt;record name="</span>
+                    <span className="text-muted">&lt;record name=&quot;</span>
                     <input
                       type="text"
                       value={line.recordName}
@@ -228,9 +228,9 @@ export default function EditDictionaryPage() {
                       className="form-control form-control-sm flex-grow-1"
                       style={{ minWidth: "100px", maxWidth: "200px" }}
                     />
-                    <span className="text-muted">" id="</span>
+                    <span className="text-muted">&quot; id=&quot;</span>
                     <span className="text-muted">{line.recordId}</span>
-                    <span className="text-muted">"&gt;</span>
+                    <span className="text-muted">&quot;&gt;</span>
                   </div>
                 );
               } else if (line.type === "field") {
@@ -240,7 +240,7 @@ export default function EditDictionaryPage() {
 
                 return (
                   <div key={i} className="d-flex flex-wrap align-items-center gap-2 mb-2">
-                    <span className="text-muted">&lt;field name="</span>
+                    <span className="text-muted">&lt;field name=&quot;</span>
                     <input
                       type="text"
                       value={line.name}
@@ -253,7 +253,7 @@ export default function EditDictionaryPage() {
                       className="form-control form-control-sm flex-grow-1"
                       style={{ minWidth: "100px", maxWidth: "200px" }}
                     />
-                    <span className="text-muted">" type="</span>
+                    <span className="text-muted">&quot; type=&quot;</span>
                     <input
                       type="text"
                       value={line.fieldType}
@@ -261,7 +261,7 @@ export default function EditDictionaryPage() {
                       className="form-control form-control-sm flex-grow-1"
                       style={{ minWidth: "100px", maxWidth: "200px" }}
                     />
-                    <span className="text-muted">"{line.rest} /&gt;</span>
+                    <span className="text-muted">&quot;{line.rest} /&gt;</span>
                   </div>
                 );
               } else {

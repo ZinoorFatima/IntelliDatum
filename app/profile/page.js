@@ -20,7 +20,7 @@ export default function ProfilePage() {
       const parsed = JSON.parse(storedAuth);
       setAuth(parsed);
     }
-  }, []);
+  }, [router, setAuth]);
 
   useEffect(() => {
     if (user) {
