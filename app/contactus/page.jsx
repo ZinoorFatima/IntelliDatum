@@ -2,6 +2,7 @@
 
 import React, { useState ,useEffect} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Image from "next/image";
 import emailjs from 'emailjs-com'; // Import EmailJS
 import Swal from "sweetalert2";
 export default function ContactUs() {
@@ -70,33 +71,19 @@ export default function ContactUs() {
   };
 
   return (
-    <main className="position-relative d-flex min-vh-100 bg-light align-items-center justify-content-center p-4 bg-light">
+    <main className="position-relative d-flex min-vh-100 bg-light align-items-center justify-content-center p-4">
       <div className="container d-flex flex-column flex-md-row justify-content-center align-items-start gap-5 position-relative">
         
-        {/* Left Text Section */}
+        {/* Left: Contact Text */}
         <div className="d-flex flex-column justify-content-center text-start w-100" style={{ maxWidth: '400px', minHeight: '430px' }}>
-          <div>
-            <h1 className="display-4 fw-bold mb-3 text-success">Contact Us</h1>
-            <p className="fs-5 text-success" style={{ lineHeight: '1.6' }}>
-              Feel free to reach out to us through the form below.
-            </p>
-          </div>
+          <h1 className="display-4 fw-bold mb-3 text-success">Contact Us</h1>
+          <p className="fs-5 text-success" style={{ lineHeight: '1.6' }}>
+            Feel free to reach out to us through the form below.
+          </p>
         </div>
 
-        {/* Form Section */}
-        <div className="position-relative d-flex justify-content-center w-100 ">
-          <img
-            src="/speech-bubble.png"
-            alt="Speech Bubble"
-            style={{
-              position: 'absolute',
-              top: '-55px',
-              right: '-10px',
-              width: '80px',
-              height: '85px',
-              zIndex: 2,
-            }}
-          />
+        {/* Right: Form Card */}
+        <div className="position-relative d-flex justify-content-center w-100">
           <div
             className="card p-4 shadow-lg position-relative bg-success"
             style={{
@@ -108,9 +95,26 @@ export default function ContactUs() {
               paddingTop: '3rem',
               minHeight: '430px',
               zIndex: 1,
-              marginRight: '-120px',
             }}
           >
+            {/* Speech Bubble in Top-Right of Card */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                zIndex: 2,
+              }}
+            >
+              <Image
+                src="/speech-bubble.png"
+                alt="Speech Bubble"
+                width={80}
+                height={85}
+              />
+            </div>
+
+            {/* Form */}
             <form className="d-grid gap-4 mt-2 bg-success" onSubmit={handleSubmit}>
               <div className="mx-auto" style={{ maxWidth: "90%", width: "100%" }}>
                 <label htmlFor="name" className="form-label fw-medium" style={{ color: '#484848' }}>
@@ -119,7 +123,7 @@ export default function ContactUs() {
                 <input
                   type="text"
                   id="name"
-                  name="name" // Name field
+                  name="name"
                   className="form-control py-2 shadow-sm"
                   placeholder="Your Name"
                   value={formData.name}
@@ -140,7 +144,7 @@ export default function ContactUs() {
                 <input
                   type="email"
                   id="email"
-                  name="email" // Email field
+                  name="email"
                   className="form-control py-2 shadow-sm"
                   placeholder="abc@gmail.com"
                   value={formData.email}
@@ -160,7 +164,7 @@ export default function ContactUs() {
                 </label>
                 <textarea
                   id="message"
-                  name="message" // Message field
+                  name="message"
                   rows="4"
                   className="form-control py-2 shadow-sm"
                   placeholder="Your message..."
