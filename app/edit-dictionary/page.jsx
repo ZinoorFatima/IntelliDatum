@@ -3,7 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { useAuth } from "../context/auth.js";
-
+import Swal
+  from "sweetalert2";
 export default function EditDictionaryPage() {
   const [fileId, setFileId] = useState(null);
   const { token } = useAuth()[0];
@@ -93,10 +94,22 @@ export default function EditDictionaryPage() {
           parseDictionaryXml(dictionary);
         } else {
           setError("Failed to load dictionary.");
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: 'Failed to load dictionary',
+            confirmButtonColor: '#d33',
+          });
         }
       } catch (err) {
         console.error(err);
-        setError("Error loading dictionary.");
+        setError("Failed to load dictionary.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: 'Failed to load dictionary',
+          confirmButtonColor: '#d33',
+        });
       } finally {
         setLoading(false);
       }
@@ -157,11 +170,24 @@ export default function EditDictionaryPage() {
       if (data.success) {
         router.push("/dashboard");
       } else {
-        setError(data.message || "Failed to save dictionary.");
+        setError("Failed to load dictionary.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: 'Failed to save to dictionary',
+          confirmButtonColor: '#d33',
+        });
       }
     } catch (err) {
       console.error(err);
       setError("Error saving dictionary.");
+      ;
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: 'Failed to save to dictionary',
+        confirmButtonColor: '#d33',
+      });
     } finally {
       setSaving(false);
     }
@@ -207,6 +233,7 @@ export default function EditDictionaryPage() {
           <span className="d-none d-md-inline">{saving ? "Saving..." : "Save"}</span>
         </button>
       </div>
+
 
       {error && <div className="alert alert-danger">{error}</div>}
 
@@ -285,6 +312,7 @@ export default function EditDictionaryPage() {
           />
         </div>
       </div>
+
     </div>
   );
 }

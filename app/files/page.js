@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/auth";
+import Swal from "sweetalert2";
 import { CloudArrowUpIcon } from "@heroicons/react/24/solid";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -30,6 +31,12 @@ const Page = () => {
         setUserId(data.userId);
       } catch (err) {
         console.error("Failed to fetch user ID:", err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: 'Failed to fetch user ID' || 'Something went wrong.',
+          confirmButtonColor: '#d33',
+        });
       }
     };
 
@@ -38,7 +45,14 @@ const Page = () => {
 
   const handleFile = (file) => {
     if (!file.name.match(/\.(txt|csv)$/i)) {
-      setError("Only .txt and .csv files are supported.");
+      setError("Please upload a .txt or .csv file");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: "Please upload a .txt or .csv file",
+        confirmButtonColor: '#d33',
+      });
+
       return;
     }
     setError(null);
@@ -71,6 +85,12 @@ const Page = () => {
     event.preventDefault();
     if (!selectedFile) {
       setError("Please select a file first!");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: error || 'Something went wrong.',
+        confirmButtonColor: '#d33',
+      });
       return;
     }
 
@@ -86,22 +106,64 @@ const Page = () => {
       formData.append("file", selectedFile);
 
       const externalRes = await fetch(`${process.env.BACKEND_API}/process`, {
+
         method: "POST",
         body: formData,
         headers: { Authorization: `Bearer ${auth?.token}` },
       });
 
-      if (!externalRes.ok) throw new Error("Failed to fetch");
-      const externalData = await externalRes.json();
 
-      setProcessedText(externalData.content || externalData.message);
-      setFileDetails((prev) => ({ ...prev, status: "Processed" }));
+
+      // Check for errors first
+      if (!externalRes.ok) throw new Error(`Processing failed: ${externalRes.status}`);
+
+      // Process the stream
+      const reader = externalRes.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let finalOutput = "";
+      let result = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n\n");
+
+        for (let line of lines) {
+          if (line.startsWith("data: ")) {
+            const data = line.replace("data: ", "").trim();
+
+            // Check for "Final result" tag
+            if (data.startsWith("Final result:base64")) {
+              const encoded = data.replace("Final result:base64:", "").trim();
+              const decoded = atob(encoded);
+              finalOutput = decoded;
+            } else {
+              // Update progress display or store it if needed
+              result = data;
+              // Optionally show in UI: e.g., setProgress(data)
+              setFileDetails(prev => ({
+                ...prev,
+                status: result
+              }));
+
+            }
+          }
+        }
+      }
+
+      // After stream finishes, set final output
+      setProcessedText(finalOutput || result); // fallback to progress if no final result
+      setFileDetails((prev) => ({ ...prev, status: "Completed" }));
+
 
       if (userId) {
         const dbFormData = new FormData();
         dbFormData.append("file", selectedFile);
         dbFormData.append("userId", userId);
-        dbFormData.append("status", "Success");
+        dbFormData.append("status", "Success"); // Set status based on processing success
+
 
         if (externalData.content) {
           const dictionaryBlob = new Blob([externalData.content], { type: "text/plain" });
@@ -112,10 +174,27 @@ const Page = () => {
           method: "POST",
           body: dbFormData,
         });
+
+
+        if (!dbResponse.ok) {
+          throw new Error("Failed to save file to database");
+
+        }
+
+        const dbData = await dbResponse.json();
+        console.log("File saved to database:", dbData);
+
+
       }
     } catch (err) {
       console.log("Upload error:", err);
       setError(err.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: error || 'Something went wrong.',
+        confirmButtonColor: '#d33',
+      });
       setFileDetails((prev) => ({ ...prev, status: "Failed" }));
 
       if (userId) {
@@ -124,7 +203,14 @@ const Page = () => {
           dbFormData.append("file", selectedFile);
           dbFormData.append("userId", userId);
           dbFormData.append("status", "Failed");
-          dbFormData.append("dictionary", new Blob([""], { type: "text/plain" }));
+          const dictionaryBlob = new Blob([""], { type: "text/plain" });
+          dbFormData.append("dictionary", dictionaryBlob, "");
+
+          console.log("STATUS : FAILED CALLING WRITE API: ");
+          for (let [key, value] of dbFormData.entries()) {
+            console.log(`${key}:`, value);
+          }
+
 
           await fetch("/api/files/write-file", {
             method: "POST",
@@ -132,6 +218,12 @@ const Page = () => {
           });
         } catch (dbError) {
           console.error("Failed to save failed status:", dbError);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: dbError || 'Something went wrong.',
+            confirmButtonColor: '#d33',
+          });
         }
       }
     } finally {
@@ -165,6 +257,7 @@ const Page = () => {
             style={{ display: "none" }}
           />
         </div>
+
 
         {/* Process Button */}
         <div className="text-center mt-4">

@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+
 import { Eye, Pencil, Trash, Download, Upload, EyeOff, Slash, FileX } from "lucide-react";
+
 
 export default function DashboardPage() {
   const [auth] = useAuth();
@@ -34,8 +37,18 @@ export default function DashboardPage() {
         });
 
         const data = await response.json();
-        if (data.success) setUserId(data.userId);
-        else setError(data.message || "Error fetching user ID");
+        if (data.success) {
+          setUserId(data.userId);
+        } else {
+          setError(data.message || "Error fetching user ID");
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: error || 'Something went wrong.',
+            confirmButtonColor: '#d33',
+          });
+        }
+
       } catch (err) {
         setError("Failed to fetch user ID");
         console.error(err);
@@ -70,10 +83,22 @@ export default function DashboardPage() {
             }
           })));
         } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: data.message || 'Something went wrong.',
+            confirmButtonColor: '#d33',
+          });
           setError(data.message || "Error fetching files");
         }
       } catch (err) {
         setError("Failed to fetch files");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: data.message || 'Something went wrong.',
+          confirmButtonColor: '#d33',
+        });
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -87,7 +112,18 @@ export default function DashboardPage() {
 
 
   const handleView = (fileId, dictionary) => {
-    if (!dictionary?.content) return setError("No dictionary content available");
+    if (!dictionary?.content) {
+      setError("No dictionary content available");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: error || 'Something went wrong.',
+        confirmButtonColor: '#d33',
+      });
+      return;
+    }
+
+
     router.push(`/view-dictionary?fileId=${fileId}`);
   };
 
@@ -137,6 +173,7 @@ export default function DashboardPage() {
   if (!authChecked) return null;
   
   return (
+
     <div style={{ minHeight: "100vh", backgroundColor: "#d1e7dd", color: "#fff", padding: "2rem", fontFamily: "sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
         <h1 style={{ fontWeight: "700", fontSize: "2.5rem", color: "#198754" }}>
@@ -181,6 +218,7 @@ export default function DashboardPage() {
 
       <div style={{ backgroundColor: "#198754", borderRadius: "12px", padding: "1rem", overflowX: "auto" }}>
         {files.length > 0 ? (
+
           <table style={{ width: "100%", color: "#fff", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid #D3E6DC" }}>
@@ -207,6 +245,7 @@ export default function DashboardPage() {
                         color: "#fff",
                         fontSize: "0.9rem"
                       }}>
+
                         {file.status}
                       </span>
                     </td>
