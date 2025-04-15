@@ -7,7 +7,17 @@ import Link from "next/link";
 export default function ProfilePage() {
   const [auth] = useAuth();
   const user = auth?.user;
+
+  const [authChecked, setAuthChecked] = useState(false);
   const [profileImage, setProfileImage] = useState("/default-profile.jpg");
+
+  useEffect(() => {
+    if (!user) {
+      window.location.href = "/";
+    } else {
+      setAuthChecked(true);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (user?.email) {
@@ -18,6 +28,9 @@ export default function ProfilePage() {
   const handleImageError = () => {
     setProfileImage("/default-profile.jpg");
   };
+
+  // 👇 Prevent rendering until auth is confirmed
+  if (!authChecked) return null;
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-success">
