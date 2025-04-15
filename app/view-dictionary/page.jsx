@@ -63,9 +63,9 @@ export default function ViewDictionaryPage() {
     router.push(`/edit-dictionary?fileId=${fileId}`);
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!dictionary) return <div>No dictionary found</div>;
+  if (isLoading) return <div className="p-4 min-vh-100">Loading...</div>;
+  if (error) return <div className="p-4 min-vh-100">Error: {error}</div>;
+  if (!dictionary) return <div className="p-4 min-vh-100">No dictionary found</div>;
 
   return (
     <div className="container mt-4">
