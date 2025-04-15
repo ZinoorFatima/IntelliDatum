@@ -4,12 +4,13 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import emailjs from "emailjs-com";
 import { useRouter } from "next/navigation";
-
+import Swal from "sweetalert2";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-
+  const [status, setStatus] = useState({ message: '', type: '' });
   const generateResetToken = () => {
     return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit token
   };
@@ -17,7 +18,7 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setEmailError("");
-
+    setStatus({ message: '', type: '' });
     if (!email) {
       setEmailError("Email is required");
       return;
@@ -29,6 +30,7 @@ const ForgotPassword = () => {
       return;
     }
 
+    setIsLoading(true);
     const token = generateResetToken();
 
     try {
@@ -40,7 +42,12 @@ const ForgotPassword = () => {
 
       const saveData = await saveRes.json();
       if (!saveRes.ok || !saveData.success) {
-        toast.error(saveData.message || "Failed to generate token.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: 'Failed to send message' || 'Something went wrong.',
+          confirmButtonColor: '#d33',
+        });
         return;
       }
 
@@ -50,7 +57,7 @@ const ForgotPassword = () => {
         random_password: randomPassword,  // This will be sent in the email
         user_name: email.split('@')[0],  // You can use the part of the email before "@" as the name
       };
-  
+
 
       const emailRes = await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
@@ -61,16 +68,34 @@ const ForgotPassword = () => {
 
       if (emailRes.status === 200) {
         toast.success("Token sent to your email.");
+        Swal.fire({
+          icon: 'success',
+          text: 'Check your email for token.' || 'Reset Token Sent!',
+          confirmButtonColor: '#198754',
+        });
         setEmail("");
         setTimeout(() => {
           router.push("/reset-password");
         }, 1500);
       } else {
-        toast.error("Failed to send email.");
+        setStatus({ message: 'Failed to reset', type: 'Danger' });
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: 'Failed to reset' || 'Something went wrong.',
+          confirmButtonColor: '#d33',
+        });
       }
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: 'Failed to reset' || 'Something went wrong.',
+        confirmButtonColor: '#d33',
+      });
+    } finally {
+      setIsLoading(false); // END loading
     }
   };
 
@@ -111,9 +136,10 @@ const ForgotPassword = () => {
           }}
         />
         {emailError && <p style={{ color: "red", fontSize: "12px" }}>{emailError}</p>}
-
+        
         <button
           onClick={handleSubmit}
+          disabled={isLoading}
           style={{
             width: "80%",
             padding: "10px",
@@ -124,7 +150,17 @@ const ForgotPassword = () => {
             cursor: "pointer",
           }}
         >
-          Send Reset Token
+          {isLoading ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </>
+          ) : (
+            "Send Reset Token"
+          )}
         </button>
       </div>
     </div>

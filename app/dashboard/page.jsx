@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 import { useRouter } from "next/navigation";
+
 import {
   Eye,
   Pencil,
@@ -13,6 +14,11 @@ import {
   Slash,
   FileX,
 } from "lucide-react";
+
+import Swal from "sweetalert2";
+
+
+
 
 export default function DashboardPage() {
   const [auth, setAuth] = useAuth();
@@ -49,8 +55,20 @@ export default function DashboardPage() {
         );
 
         const data = await response.json();
-        if (data.success) setUserId(data.userId);
-        else console.log("Error fetching user ID");
+
+        if (data.success) {
+          setUserId(data.userId);
+        } else {
+          setError(data.message || "Error fetching user ID");
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: error || 'Something went wrong.',
+            confirmButtonColor: '#d33',
+          });
+        }
+
+
       } catch (err) {
         console.log("Failed to fetch user ID", err);
       }
@@ -94,10 +112,25 @@ export default function DashboardPage() {
             }))
           );
         } else {
-          console.log("Error fetching files");
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: data.message || 'Something went wrong.',
+            confirmButtonColor: '#d33',
+          });
+          setError(data.message || "Error fetching files");
         }
       } catch (err) {
-        console.log("Failed to fetch files", err);
+        setError("Failed to fetch files");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: data.message || 'Something went wrong.',
+          confirmButtonColor: '#d33',
+        });
+        console.error(err);
+
       } finally {
         setIsLoading(false);
       }
@@ -109,7 +142,19 @@ export default function DashboardPage() {
   }, [user, authChecked, userId, auth.token]);
 
   const handleView = (fileId, dictionary) => {
-    if (!dictionary?.content) return null;
+
+    if (!dictionary?.content) {
+      setError("No dictionary content available");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: error || 'Something went wrong.',
+        confirmButtonColor: '#d33',
+      });
+      return;
+    }
+
+
     router.push(`/view-dictionary?fileId=${fileId}`);
   };
 
@@ -160,6 +205,7 @@ export default function DashboardPage() {
   if (loadingUser) return null;
 
   return (
+
     <div
       style={{
         minHeight: "100vh",
@@ -189,6 +235,7 @@ export default function DashboardPage() {
             minWidth: "200px",
           }}
         >
+
           Dashboard
         </h1>
         <button
@@ -254,6 +301,7 @@ export default function DashboardPage() {
         }}
       >
         {files.length > 0 ? (
+
           <table
             style={{
               width: "100%",
@@ -261,6 +309,7 @@ export default function DashboardPage() {
               borderCollapse: "collapse",
             }}
           >
+
             <thead>
               <tr style={{ borderBottom: "1px solid #D3E6DC" }}>
                 <th style={{ textAlign: "left", padding: "0.75rem" }}>
@@ -281,6 +330,7 @@ export default function DashboardPage() {
                       {file.fileName}
                     </td>
                     <td style={{ textAlign: "center" }}>
+
                       <span
                         style={{
                           display: "inline-block",
@@ -296,6 +346,7 @@ export default function DashboardPage() {
                           fontSize: "0.9rem",
                         }}
                       >
+
                         {file.status}
                       </span>
                     </td>

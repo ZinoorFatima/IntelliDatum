@@ -3,7 +3,10 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 import Image from "next/image";
 import Link from "next/link";
+
 import { useRouter } from "next/navigation";
+
+import Swal from "sweetalert2";
 
 export default function ProfilePage() {
   const [auth, setAuth] = useAuth();
@@ -36,6 +39,7 @@ export default function ProfilePage() {
   if (loading) return null;
 
   return (
+
     <div className="bg-success min-vh-100 d-flex justify-content-center align-items-center p-3">
       <div className="bg-white rounded-4 shadow p-4 p-md-5 w-100" style={{ maxWidth: "600px" }}>
         <div className="d-flex flex-column align-items-center text-center mb-4">
@@ -54,6 +58,7 @@ export default function ProfilePage() {
           <h3 className="mb-1">{user?.FirstName} {user?.LastName}</h3>
           <p className="text-muted text-break">{user?.email}</p>
         </div>
+
 
         <ul className="list-group list-group-flush mb-4">
           <li className="list-group-item d-flex justify-content-between flex-wrap">
