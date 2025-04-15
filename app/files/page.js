@@ -94,6 +94,8 @@ const Page = () => {
           dbFormData.append("dictionary", dictionaryBlob, `${selectedFile.name}_dictionary.txt`);
         }
 
+        console.log("STATUS : SUCCESS CALLING WRITE API: ", dbFormData);
+
         const dbResponse = await fetch("/api/files/write-file", {
           method: "POST",
           body: dbFormData,
@@ -120,6 +122,12 @@ const Page = () => {
           dbFormData.append("status", "Failed");
           const dictionaryBlob = new Blob([""], { type: "text/plain" });
           dbFormData.append("dictionary", dictionaryBlob, "");
+
+          console.log("STATUS : FAILED CALLING WRITE API: ");
+          for (let [key, value] of dbFormData.entries()) {
+            console.log(`${key}:`, value);
+          }
+          
           await fetch("/api/files/write-file", {
             method: "POST",
             body: dbFormData,

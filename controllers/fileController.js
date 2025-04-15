@@ -6,10 +6,10 @@ import  fileModel  from "../models/fileModel";  // Import the file model
 
 export const writeFileController = async (req) => {
     try {
-        const formData = await req.formData();  // Get form data
+        const formData = await req.formData();
 
-        const userId = formData.get("userId");  // Extract userId from form data
-        const status = formData.get("status");  // Extract status from form data
+        const userId = formData.get("userId");
+        const status = formData.get("status");
 
         if (!userId) {
             return new Response(JSON.stringify({ message: "User ID is required" }), { status: 400 });
@@ -18,51 +18,42 @@ export const writeFileController = async (req) => {
             return new Response(JSON.stringify({ message: "Status is required" }), { status: 400 });
         }
 
-        const file = formData.get("file");  // Extract main file from form data
+        const file = formData.get("file");
         if (!file) {
             return new Response(JSON.stringify({ message: "File is required" }), { status: 400 });
         }
 
-        const dictionaryFile = formData.get("dictionary");  // Extract dictionary file (optional)
+        // Read file as Buffer from memory
+        const fileData = Buffer.from(await file.arrayBuffer());
+        const fileSize = file.size;
+        const MAX_SIZE = 10 * 1024 * 1024;
+
+        if (fileSize > MAX_SIZE) {
+            return new Response(JSON.stringify({ message: "File is too large. Max 10MB allowed." }), { status: 400 });
+        }
+
+        // Optional: handle dictionary file
+        const dictionaryFile = formData.get("dictionary");
         let dictionaryData = null;
         let dictionaryName = null;
 
-        if (dictionaryFile) {
-            // Save dictionary file to disk (or process it if needed)
-            const dictionaryFilePath = path.join(process.cwd(), "uploads", dictionaryFile.name);
-            await fs.promises.writeFile(dictionaryFilePath, Buffer.from(await dictionaryFile.arrayBuffer()));
-
-            dictionaryData = await fs.promises.readFile(dictionaryFilePath, "utf-8");  // Read file contents
+        if (dictionaryFile && dictionaryFile.size > 0) {
+            dictionaryData = (await dictionaryFile.text()).toString();  // Read as plain text
             dictionaryName = dictionaryFile.name;
         }
 
-        // Check file size (example: 10MB limit)
-        const fileSize = file.size;
-        const MAX_SIZE = 10 * 1024 * 1024;  // 10MB
-        if (fileSize > MAX_SIZE) {
-            return new Response(JSON.stringify({ message: "File is too large. Maximum size allowed is 10MB" }), { status: 400 });
-        }
-
-        // Generate a unique file name
         const fileName = `${userId}-${Date.now()}-${file.name}`;
-        const filePath = path.join(process.cwd(), "uploads", fileName);
 
-        // Save the main file to disk
-        await fs.promises.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
-
-        // Read file content as Buffer (for fileData)
-        const fileData = await fs.promises.readFile(filePath);
-
-        // Create a file record in the database
+        // Save to MongoDB
         const newFile = await new fileModel({
-            userId,  // User who uploaded the file
+            userId,
             fileName,
             fileSize,
-            status,  // Store the status sent with the form data
-            dictionaryName,  // Store the dictionary file name
-            dictionaryFile: dictionaryData,  // Store the dictionary file content (Base64/Plain Text/XML)
-            fileData,  // Store the actual file data (Buffer)
-            fileMimeType: file.type,  // Optional: MIME type of the uploaded file
+            status,
+            dictionaryName,
+            dictionaryFile: dictionaryData,
+            fileData,
+            fileMimeType: file.type,
         }).save();
 
         return new Response(
