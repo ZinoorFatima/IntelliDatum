@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 import { useRouter } from "next/navigation";
-import { Eye, Pencil, Trash, Download, Upload } from "lucide-react";
+import { Eye, Pencil, Trash, Download, Upload, EyeOff, Slash, FileX } from "lucide-react";
 
 export default function DashboardPage() {
   const [auth] = useAuth();
@@ -16,7 +16,6 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchUserId = async () => {
       if (!auth.user) return;
-
       try {
         const response = await fetch(`/api/auth/get-user-id?email=${auth.user.email}`, {
           method: "GET",
@@ -174,55 +173,58 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {files.map(file => (
-                <tr key={file._id} style={{ borderBottom: "1px solid #D3E6DC" }}>
-                  <td style={{ padding: "0.75rem", color: "#e0f2f1" }}>{file.fileName}</td>
-                  <td style={{ textAlign: "center" }}>
-                    <span style={{
-                      display: "inline-block",
-                      padding: "0.25rem 0.75rem",
-                      borderRadius: "999px",
-                      backgroundColor:
-                        file.status === "Success" ? "#144E37" :
-                        file.status === "Failed" ? "#dc3545" : "#144E37",
-                      color: "#fff",
-                      fontSize: "0.9rem"
-                    }}>
-                      {file.status}
-                    </span>
-                  </td>
-                  <td style={{ padding: "0.75rem", color: "#e0f2f1" }}>{file.dictionary?.name || "N/A"}</td>
-                  <td style={{ padding: "0.75rem", textAlign: "center" }}>
-                    <button
-                      onClick={() => handleView(file._id, file.dictionary)}
-                      disabled={!file.dictionary?.content}
-                      style={{ background: "none", border: "none", color: "#fff", marginRight: "0.5rem", cursor: "pointer" }}
-                    >
-                      <Eye size={18} />
-                    </button>
-                    <button
-                      onClick={() => router.push(`/edit-dictionary?fileId=${file._id}`)}
-                      disabled={!file.dictionary?.content}
-                      style={{ background: "none", border: "none", color: "#fff", marginRight: "0.5rem", cursor: "pointer" }}
-                    >
-                      <Pencil size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDownload(file.dictionary)}
-                      disabled={!file.dictionary?.content}
-                      style={{ background: "none", border: "none", color: "#fff", marginRight: "0.5rem", cursor: "pointer" }}
-                    >
-                      <Download size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(file._id)}
-                      style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer" }}
-                    >
-                      <Trash size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {files.map(file => {
+                const isDisabled = file.status === "Failed" || !file.dictionary?.content;
+                return (
+                  <tr key={file._id} style={{ borderBottom: "1px solid #D3E6DC" }}>
+                    <td style={{ padding: "0.75rem", color: "#e0f2f1" }}>{file.fileName}</td>
+                    <td style={{ textAlign: "center" }}>
+                      <span style={{
+                        display: "inline-block",
+                        padding: "0.25rem 0.75rem",
+                        borderRadius: "999px",
+                        backgroundColor:
+                          file.status === "Success" ? "#144E37" :
+                          file.status === "Failed" ? "#dc3545" : "#144E37",
+                        color: "#fff",
+                        fontSize: "0.9rem"
+                      }}>
+                        {file.status}
+                      </span>
+                    </td>
+                    <td style={{ padding: "0.75rem", color: "#e0f2f1" }}>{file.dictionary?.name || "N/A"}</td>
+                    <td style={{ padding: "0.75rem", textAlign: "center" }}>
+                      <button
+                        onClick={() => handleView(file._id, file.dictionary)}
+                        disabled={isDisabled}
+                        style={{ background: "none", border: "none", color: isDisabled ? "#9ca3af" : "#fff", marginRight: "0.5rem", cursor: isDisabled ? "not-allowed" : "pointer" }}
+                      >
+                        {isDisabled ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                      <button
+                        onClick={() => router.push(`/edit-dictionary?fileId=${file._id}`)}
+                        disabled={isDisabled}
+                        style={{ background: "none", border: "none", color: isDisabled ? "#9ca3af" : "#fff", marginRight: "0.5rem", cursor: isDisabled ? "not-allowed" : "pointer" }}
+                      >
+                        {isDisabled ? <Slash size={18} /> : <Pencil size={18} />}
+                      </button>
+                      <button
+                        onClick={() => handleDownload(file.dictionary)}
+                        disabled={isDisabled}
+                        style={{ background: "none", border: "none", color: isDisabled ? "#9ca3af" : "#fff", marginRight: "0.5rem", cursor: isDisabled ? "not-allowed" : "pointer" }}
+                      >
+                        {isDisabled ? <FileX size={18} /> : <Download size={18} />}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(file._id)}
+                        style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer" }}
+                      >
+                        <Trash size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (
