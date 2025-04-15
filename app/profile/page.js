@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 import Image from "next/image";
@@ -9,7 +9,6 @@ export default function ProfilePage() {
   const user = auth?.user;
   const [profileImage, setProfileImage] = useState("/default-profile.jpg");
 
-  // Fetch profile image from API when user is loaded
   useEffect(() => {
     if (user?.email) {
       setProfileImage(`/api/user/profile-picture?email=${user.email}`);
@@ -17,32 +16,35 @@ export default function ProfilePage() {
   }, [user]);
 
   const handleImageError = () => {
-    setProfileImage("/default-profile.jpg"); // fallback if fetch fails
+    setProfileImage("/default-profile.jpg");
   };
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-success">
       <main className="container py-5 flex-grow-1">
         <div className="row justify-content-center py-5">
-          <div className="col-md-8">
+          <div className="col-12 col-sm-10 col-md-8 col-lg-6">
             <div className="card shadow-sm border-0 bg-light">
-              <div className="card-body p-5">
+              <div className="card-body p-4 p-md-5">
                 {/* Profile Photo */}
-                <div className="d-flex align-items-center mb-4">
-                  <div style={{ position: 'relative' }}>
+                <div className="d-flex flex-column flex-sm-row align-items-center mb-4 text-center text-sm-start">
+                  <div className="mb-3 mb-sm-0 me-sm-4">
                     {profileImage ? (
                       <Image
                         src={profileImage}
                         alt="Profile"
                         width={80}
                         height={80}
-                        className="rounded-circle me-4"
-                        style={{ objectFit: 'cover', border: '3px solid #198754' }}
+                        className="rounded-circle"
+                        style={{
+                          objectFit: "cover",
+                          border: "3px solid #198754",
+                        }}
                         onError={handleImageError}
                       />
                     ) : (
                       <div
-                        className="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fs-3 me-4"
+                        className="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fs-3"
                         style={{ width: "80px", height: "80px" }}
                       >
                         {user?.FirstName?.charAt(0)}
@@ -68,18 +70,25 @@ export default function ProfilePage() {
                   </li>
                   <li className="list-group-item d-flex justify-content-between">
                     <span className="fw-bold">Email:</span>
-                    <span>{user?.email}</span>
+                    <span className="text-break">{user?.email}</span>
                   </li>
                 </ul>
 
                 {/* Action Buttons */}
-                <div className="d-flex flex-wrap justify-content-center gap-3">
-                  <Link href="/edit-profile" className="btn btn-outline-success">Edit Profile</Link>
-                  <Link href="/change-password" className="btn btn-outline-secondary">Change Password</Link>
-                  <button className="btn btn-danger" onClick={() => {
-                    localStorage.removeItem("auth");
-                    window.location.href = "/signin";
-                  }}>
+                <div className="d-flex flex-column flex-sm-row flex-wrap justify-content-center gap-2">
+                  <Link href="/edit-profile" className="btn btn-outline-success w-100 w-sm-auto">
+                    Edit Profile
+                  </Link>
+                  <Link href="/change-password" className="btn btn-outline-secondary w-100 w-sm-auto">
+                    Change Password
+                  </Link>
+                  <button
+                    className="btn btn-danger w-100 w-sm-auto"
+                    onClick={() => {
+                      localStorage.removeItem("auth");
+                      window.location.href = "/signin";
+                    }}
+                  >
                     Logout
                   </button>
                 </div>

@@ -62,7 +62,7 @@ const Signin = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '50vh',
+        height: '100%',
       }}
     >
       <div

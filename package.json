@@ -9,19 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "bcrypt": "^5.1.1",
     "bootstrap": "^5.3.3",
     "crypto": "^1.0.1",
     "email-js": "^2.0.3",
     "emailjs-com": "^3.2.0",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.488.0",
     "mongoose": "^8.12.1",
     "multer": "^1.4.5-lts.2",
     "next": "15.0.4",
     "nodemailer": "^6.10.0",
     "react": "^19.0.0",
+    "react-bootstrap-icons": "^1.11.5",
     "react-dom": "^19.0.0",
-    "react-hot-toast": "^2.5.2"
+    "react-hot-toast": "^2.5.2",
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "@types/node": "^20",

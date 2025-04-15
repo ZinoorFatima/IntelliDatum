@@ -111,7 +111,7 @@ const SignUp = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '50vh',
+        height: '100%',
       }}
     >
       <div style={{ maxWidth: '80%', width: '100%', display: 'flex', margin: '20px auto' }}>
