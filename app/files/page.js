@@ -47,6 +47,12 @@ const Page = () => {
 
     if (!file.name.match(/\.(txt|csv)$/i)) {
       setError("Please upload a .txt or .csv file");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: "Please upload a .txt or .csv file",
+        confirmButtonColor: '#d33',
+      });
       return;
     }
 
@@ -58,6 +64,12 @@ const Page = () => {
     event.preventDefault();
     if (!selectedFile) {
       setError("Please select a file first!");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: error || 'Something went wrong.',
+        confirmButtonColor: '#d33',
+      });
       return;
     }
 
@@ -149,14 +161,22 @@ const Page = () => {
 
         if (!dbResponse.ok) {
           throw new Error("Failed to save file to database");
+
         }
 
         const dbData = await dbResponse.json();
         console.log("File saved to database:", dbData);
+
       }
     } catch (err) {
       console.error("Upload error:", err);
       setError(err.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: error || 'Something went wrong.',
+        confirmButtonColor: '#d33',
+      });
       setFileDetails((prev) => ({ ...prev, status: "Failed" }));
 
       // If processing failed but we have a user, save with failed status
@@ -180,6 +200,12 @@ const Page = () => {
           });
         } catch (dbError) {
           console.error("Failed to save failed status:", dbError);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: dbError || 'Something went wrong.',
+            confirmButtonColor: '#d33',
+          });
         }
       }
     } finally {
@@ -220,11 +246,7 @@ const Page = () => {
             disabled={isLoading}
           />
 
-          {error && (
-            <div style={{ color: "#dc3545", marginBottom: "15px", padding: "10px", backgroundColor: "#f8d7da", borderRadius: "5px" }}>
-              {error}
-            </div>
-          )}
+
 
           <button
             type="submit"

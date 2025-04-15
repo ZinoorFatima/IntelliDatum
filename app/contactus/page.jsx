@@ -48,7 +48,7 @@ export default function ContactUs() {
           console.log('SUCCESS!', response.status, response.text);
           Swal.fire({
             icon: 'success',
-            text: data.message || 'Message Sent Successfully!',
+            text: 'Message Sent Successfully!' || 'Message Sent Successfully!',
             confirmButtonColor: '#198754',
           });
           setFormData({ name: '', email: '', message: '' }); // Clear the form
