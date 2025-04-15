@@ -8,24 +8,29 @@ export default function EditProfile() {
   const [form, setForm] = useState({ FirstName: "", LastName: "" });
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingUser, setLoadingUser] =useState(true);
   const router = useRouter();
   const [authChecked, setAuthChecked] = useState(false);
 
-  useEffect(() => {
-    if (!auth?.user) {
-      window.location.href = "/";  // Redirect to the homepage or login page if no user
+useEffect(() => {
+    const storedAuth = localStorage.getItem("auth");
+    if (!storedAuth) {
+      router.push('/');
     } else {
-      setAuthChecked(true); // Allow rendering if auth is valid
+      const parsed = JSON.parse(storedAuth);
+      setAuth(parsed);
     }
-  }, [auth]);
+  }, []);
 
   useEffect(() => {
     if (auth?.user) {
+      setLoadingUser(false);
       setForm({
         FirstName: auth.user.FirstName || "",
         LastName: auth.user.LastName || "",
       });
     }
+
   }, [auth]);
 
   const handleChange = (e) => {
@@ -73,70 +78,62 @@ export default function EditProfile() {
     }
   };
 
-  // 👇 Prevent rendering until auth is confirmed
-  if (!authChecked) return null;
+  if (loadingUser) return null;
 
   return (
-    <div className="d-flex flex-column min-vh-100 bg-success">
-      <main
-        className="container-fluid d-flex justify-content-center align-items-center"
-        style={{ minHeight: "100vh" }}
-      >
-        <div className="col-11 col-sm-10 col-md-8 col-lg-5 col-xl-4">
-          <div className="card shadow-sm border-0 bg-light">
-            <div className="card-body p-5">
-              <h2 className="mb-4 text-center">Edit Profile</h2>
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label className="form-label fw-bold">First Name</label>
-                  <input
-                    name="FirstName"
-                    value={form.FirstName}
-                    onChange={handleChange}
-                    className="form-control"
-                    placeholder="First Name"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label fw-bold">Last Name</label>
-                  <input
-                    name="LastName"
-                    value={form.LastName}
-                    onChange={handleChange}
-                    className="form-control"
-                    placeholder="Last Name"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label fw-bold">Email</label>
-                  <input
-                    name="email"
-                    value={auth?.user?.email || ""}
-                    readOnly
-                    className="form-control text-muted bg-light"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="form-label fw-bold">Profile Picture</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFile}
-                    className="form-control"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="btn btn-success w-100"
-                  disabled={loading}
-                >
-                  {loading ? "Updating..." : "Update Profile"}
-                </button>
-              </form>
-            </div>
+    <div className="bg-success min-vh-100 d-flex justify-content-center align-items-center p-3">
+      <div className="bg-white rounded-4 shadow p-4 p-md-5 w-100" style={{ maxWidth: "600px" }}>
+        <h2 className="mb-4 text-center">Edit Profile</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label fw-bold">First Name</label>
+            <input
+              name="FirstName"
+              value={form.FirstName}
+              onChange={handleChange}
+              className="form-control"
+              placeholder="First Name"
+              required
+            />
           </div>
-        </div>
-      </main>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Last Name</label>
+            <input
+              name="LastName"
+              value={form.LastName}
+              onChange={handleChange}
+              className="form-control"
+              placeholder="Last Name"
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Email</label>
+            <input
+              name="email"
+              value={auth?.user?.email || ""}
+              readOnly
+              className="form-control text-muted bg-light"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="form-label fw-bold">Profile Picture</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFile}
+              className="form-control"
+            />
+          </div>
+          <button
+            type="submit"
+            className="btn btn-success w-100"
+            disabled={loading}
+          >
+            {loading ? "Updating..." : "Update Profile"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

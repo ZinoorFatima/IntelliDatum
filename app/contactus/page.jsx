@@ -56,123 +56,91 @@ export default function ContactUs() {
   };
 
   return (
-    <main className="position-relative d-flex min-vh-100 bg-light align-items-center justify-content-center p-4">
-      <div className="container d-flex flex-column flex-md-row justify-content-center align-items-start gap-5 position-relative">
-        
+  <main className="position-relative min-vh-100 bg-light d-flex align-items-center justify-content-center p-3">
+    <div className="container">
+      <div className="row g-5 align-items-center justify-content-center">
+
         {/* Left: Contact Text */}
-        <div className="d-flex flex-column justify-content-center text-start w-100" style={{ maxWidth: '400px', minHeight: '430px' }}>
-          <h1 className="display-4 fw-bold mb-3 text-success">Contact Us</h1>
+        <div className="col-12 col-md-5 text-center text-md-start">
+          <h1 className="display-5 fw-bold mb-3 text-success">Contact Us</h1>
           <p className="fs-5 text-success" style={{ lineHeight: '1.6' }}>
             Feel free to reach out to us through the form below.
           </p>
         </div>
 
         {/* Right: Form Card */}
-        <div className="position-relative d-flex justify-content-center w-100">
+        <div className="col-12 col-md-6">
           <div
-            className="card p-4 shadow-lg position-relative bg-success"
+            className="position-relative shadow-lg p-4 bg-success"
             style={{
-              width: "100%",
-              maxWidth: "450px",
-              borderRadius: "20px",
-              backgroundColor: '#7BC28A',
-              border: 'none',
-              paddingTop: '3rem',
-              minHeight: '430px',
-              zIndex: 1,
+              borderRadius: '20px',
             }}
           >
-            {/* Speech Bubble in Top-Right of Card */}
+            {/* Speech Bubble */}
             <div
+              className="position-absolute"
               style={{
-                position: 'absolute',
                 top: '10px',
                 right: '10px',
+                width: '60px',
+                height: '60px',
                 zIndex: 2,
               }}
             >
               <Image
                 src="/speech-bubble.png"
                 alt="Speech Bubble"
-                width={80}
-                height={85}
+                fill
+                style={{ objectFit: 'contain' }}
               />
             </div>
 
             {/* Form */}
-            <form className="d-grid gap-4 mt-2 bg-success" onSubmit={handleSubmit}>
-              <div className="mx-auto" style={{ maxWidth: "90%", width: "100%" }}>
-                <label htmlFor="name" className="form-label fw-medium" style={{ color: '#484848' }}>
-                  Name
-                </label>
+            <form className="mt-4" onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label htmlFor="name" className="form-label fw-medium text-dark">Name</label>
                 <input
                   type="text"
                   id="name"
                   name="name"
-                  className="form-control py-2 shadow-sm"
+                  className="form-control"
                   placeholder="Your Name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    height: '45px'
-                  }}
+                  required
                 />
               </div>
 
-              <div className="mx-auto" style={{ maxWidth: "90%", width: "100%" }}>
-                <label htmlFor="email" className="form-label fw-medium" style={{ color: '#484848' }}>
-                  Email
-                </label>
+              <div className="mb-3">
+                <label htmlFor="email" className="form-label fw-medium text-dark">Email</label>
                 <input
                   type="email"
                   id="email"
                   name="email"
-                  className="form-control py-2 shadow-sm"
+                  className="form-control"
                   placeholder="abc@gmail.com"
                   value={formData.email}
                   onChange={handleInputChange}
-                  style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    height: '45px'
-                  }}
+                  required
                 />
               </div>
 
-              <div className="mx-auto" style={{ maxWidth: "90%", width: "100%" }}>
-                <label htmlFor="message" className="form-label fw-medium" style={{ color: '#484848' }}>
-                  Message
-                </label>
+              <div className="mb-3">
+                <label htmlFor="message" className="form-label fw-medium text-dark">Message</label>
                 <textarea
                   id="message"
                   name="message"
+                  className="form-control"
                   rows="4"
-                  className="form-control py-2 shadow-sm"
                   placeholder="Your message..."
                   value={formData.message}
                   onChange={handleInputChange}
-                  style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    border: 'none',
-                    borderRadius: '8px'
-                  }}
-                ></textarea>
+                  required
+                />
               </div>
 
               <div className="text-center">
-                <button
-                  type="submit"
-                  className="btn btn-light mt-2 py-2 px-4 fw-medium shadow"
-                  style={{
-                    borderRadius: '8px',
-                    fontSize: '1.1rem',
-                    minWidth: '150px'
-                  }}
-                >
+                <button type="submit" className="btn btn-light px-4 py-2 fw-medium shadow rounded">
                   Send
                 </button>
               </div>
@@ -180,6 +148,8 @@ export default function ContactUs() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
+  </main>
+
   );
 }

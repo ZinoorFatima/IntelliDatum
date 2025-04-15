@@ -79,6 +79,25 @@ code {
   text-align: center;
 }
 
+/* Dropdown animation */
+.animate-dropdown {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: block !important; /* Let Bootstrap handle visibility */
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1050;
+}
+
+/* When Bootstrap adds .show to the dropdown */
+.animate-dropdown.show {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
 
 
 /* footer*/

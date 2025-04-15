@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useAuth } from "../app/context/auth";
-
+import '../app/globals.css';
 const Header = () => {
   const [auth, setAuth] = useAuth();
   const [profileImage, setProfileImage] = useState("/default-profile.jpg"); // default initially
@@ -60,27 +60,27 @@ const Header = () => {
         {/* Nav Links */}
         <div className="collapse navbar-collapse" id="navbarContent">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
-            <li className="nav-item">
+            <li className="nav-item mx-2">
               <Link href="/" className="nav-link">
                 Home
               </Link>
             </li>
-            <li className="nav-item">
+            <li className="nav-item mx-2">
               <Link href="/files" className="nav-link">
                 Files
               </Link>
             </li>
-            <li className="nav-item">
+            <li className="nav-item mx-2">
               <Link href="/contactus" className="nav-link">
                 Contact
               </Link>
             </li>
 
             {!auth?.user ? (
-              <li className="nav-item">
+              <li className="nav-item mx-2">
                 <Link
                   href="/signin"
-                  className="btn btn-success px-3 ms-3 text-white"
+                  className="btn btn-success px-3  text-white"
                 >
                   Login
                 </Link>
@@ -104,7 +104,7 @@ const Header = () => {
                     onError={handleImageError}
                   />
                 </a>
-                <ul className="dropdown-menu dropdown-menu-end">
+                <ul className="dropdown-menu dropdown-menu-end animate-dropdown">
                   <li>
                     <Link href="/profile" className="dropdown-item">
                       Profile

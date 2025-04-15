@@ -416,7 +416,9 @@ export const createResetTokenController = async (req) => {
       );
     }
 
+    console.log("EMAIL", email);
     const user = await userModel.findOne({ email });
+    console.log("USER: ",user);
     if (!user) {
       return new Response(
         JSON.stringify({ success: false, message: "User not found" }),
