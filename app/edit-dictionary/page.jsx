@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { useAuth } from "../context/auth.js";
@@ -22,6 +22,47 @@ export default function EditDictionaryPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+
+  const parseDictionaryXml = useCallback((xml) => {
+    const lines = xml.split("\n").map((line, index) => {
+      const fieldMatch = line.match(/<field name="([^"]+)" type="([^"]+)"(.*?)\/>/);
+      const recordMatch = line.match(/<record name="([^"]+)" id="([^"]+)"\s*>/);
+      const separatorMatch = line.match(/<field-info separator="(.+?)"/);
+
+      console.log(dictionaryXml);
+
+      if (separatorMatch) {
+        setDelimiter(separatorMatch[1]);
+      }
+
+      if (fieldMatch) {
+        return {
+          type: "field",
+          index,
+          originalLine: line,
+          name: fieldMatch[1],
+          fieldType: fieldMatch[2],
+          rest: fieldMatch[3],
+        };
+      } else if (recordMatch) {
+        return {
+          type: "record",
+          index,
+          originalLine: line,
+          recordName: recordMatch[1],
+          recordId: recordMatch[2],
+        };
+      } else {
+        return {
+          type: "text",
+          index,
+          content: line,
+        };
+      }
+    });
+
+    setParsedLines(lines);
+  }, [dictionaryXml]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -62,7 +103,7 @@ export default function EditDictionaryPage() {
     };
 
     fetchData();
-  }, [fileId, token]);
+  }, [fileId, token, parseDictionaryXml]);
 
   const findCurrentRecordId = (fieldLineIndex) => {
     for (let i = fieldLineIndex; i >= 0; i--) {
@@ -72,45 +113,6 @@ export default function EditDictionaryPage() {
       }
     }
     return null;
-  };
-
-  const parseDictionaryXml = (xml) => {
-    const lines = xml.split("\n").map((line, index) => {
-      const fieldMatch = line.match(/<field name="([^"]+)" type="([^"]+)"(.*?)\/>/);
-      const recordMatch = line.match(/<record name="([^"]+)" id="([^"]+)"\s*>/);
-      const separatorMatch = line.match(/<field-info separator="(.+?)"/);
-
-      if (separatorMatch) {
-        setDelimiter(separatorMatch[1]);
-      }
-
-      if (fieldMatch) {
-        return {
-          type: "field",
-          index,
-          originalLine: line,
-          name: fieldMatch[1],
-          fieldType: fieldMatch[2],
-          rest: fieldMatch[3],
-        };
-      } else if (recordMatch) {
-        return {
-          type: "record",
-          index,
-          originalLine: line,
-          recordName: recordMatch[1],
-          recordId: recordMatch[2],
-        };
-      } else {
-        return {
-          type: "text",
-          index,
-          content: line,
-        };
-      }
-    });
-
-    setParsedLines(lines);
   };
 
   const handleFieldChange = (index, key, value) => {
@@ -217,7 +219,7 @@ export default function EditDictionaryPage() {
               if (line.type === "record") {
                 return (
                   <div key={i} className="d-flex align-items-center gap-2 mb-2">
-                    <span className="text-muted">{"<record name=\""}</span>
+                    <span className="text-muted">&lt;record name=&quot;</span>
                     <input
                       type="text"
                       value={line.recordName}
@@ -237,7 +239,7 @@ export default function EditDictionaryPage() {
 
                 return (
                   <div key={i} className="d-flex align-items-center gap-2 mb-1">
-                    <span className="text-muted">&lt;field name="</span>
+                    <span className="text-muted">&lt;field name=&quot;</span>
                     <input
                       type="text"
                       value={line.name}
@@ -250,7 +252,7 @@ export default function EditDictionaryPage() {
                       className="form-control form-control-sm"
                       style={{ width: "25%" }}
                     />
-                    <span className="text-muted">" type="</span>
+                    <span className="text-muted">&quot; type=</span>
                     <input
                       type="text"
                       value={line.fieldType}
@@ -258,7 +260,7 @@ export default function EditDictionaryPage() {
                       className="form-control form-control-sm"
                       style={{ width: "20%" }}
                     />
-                    <span className="text-muted">{`"${line.rest} />`}</span>
+                    <span className="text-muted">&quot;{line.rest} /&gt;</span>
                   </div>
                 );
               } else {

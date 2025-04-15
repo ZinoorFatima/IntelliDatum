@@ -1,13 +1,8 @@
-// components/Footer.js
-//import Link from 'next/link';
-
 const Footer = () => {
   return (
-    <div className='footer'>
-      <p className='rights'>
-        All Right Reserved &copy;
-      </p>
-    </div>
+    <footer className="bg-success text-white text-center py-3 mt-auto">
+      <p className="mb-0">All Rights Reserved &copy;</p>
+    </footer>
   );
 };
 

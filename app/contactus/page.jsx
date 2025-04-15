@@ -2,6 +2,7 @@
 
 import React, { useState ,useEffect} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Image from "next/image";
 import emailjs from 'emailjs-com'; // Import EmailJS
 
 export default function ContactUs() {
@@ -70,18 +71,22 @@ export default function ContactUs() {
 
         {/* Form Section */}
         <div className="position-relative d-flex justify-content-center w-100 ">
-          <img
+        <div>
+          <Image
             src="/speech-bubble.png"
             alt="Speech Bubble"
+            width={80}        // ✅ Required
+            height={85}       // ✅ Required
             style={{
               position: 'absolute',
               top: '-55px',
               right: '-10px',
-              width: '80px',
-              height: '85px',
+              width: '80px',   // Optional for inline consistency
+              height: '85px',  // Optional
               zIndex: 2,
             }}
           />
+        </div>
           <div
             className="card p-4 shadow-lg position-relative bg-success"
             style={{
