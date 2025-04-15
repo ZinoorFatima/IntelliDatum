@@ -110,6 +110,30 @@ export default function DashboardPage() {
     }, 0);
   };
 
+  const handleDelete = async (fileId) => {
+    if (!confirm("Are you sure you want to delete this file?")) return;
+  
+    try {
+      const response = await fetch(`/api/files/delete-file?fileId=${fileId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${auth.token}`,
+        },
+      });
+  
+      const data = await response.json();
+      if (data.success) {
+        setFiles(prev => prev.filter(file => file._id !== fileId));
+      } else {
+        setError(data.message || "Failed to delete file");
+      }
+    } catch (err) {
+      setError("Error deleting file");
+      console.error(err);
+    }
+  };
+  
+
   const total = files.length;
   const success = files.filter((f) => f.status === "Success").length;
   const failed = files.filter((f) => f.status === "Failed").length;
@@ -232,6 +256,13 @@ export default function DashboardPage() {
                         disabled={!file.dictionary?.content}
                       >
                         Download
+                      </button>
+                      <button
+                        onClick={() => handleDelete(file._id)}
+                        className="btn btn-sm btn-danger"
+                        title="Delete File"
+                      >
+                        🗑️
                       </button>
                     </td>
                   </tr>
