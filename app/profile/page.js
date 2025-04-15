@@ -48,6 +48,7 @@ export default function ProfilePage() {
                         alt="Profile"
                         width={80}
                         height={80}
+                        unoptimized
                         className="rounded-circle"
                         style={{
                           objectFit: "cover",
