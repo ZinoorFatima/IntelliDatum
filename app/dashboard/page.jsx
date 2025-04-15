@@ -13,9 +13,20 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    if (!auth.user) {
+      router.replace('/');
+    } else {
+      setAuthChecked(true);
+    }
+  }, [auth, router]);
+
   useEffect(() => {
     const fetchUserId = async () => {
       if (!auth.user) return;
+
       try {
         const response = await fetch(`/api/auth/get-user-id?email=${auth.user.email}`, {
           method: "GET",
@@ -31,8 +42,10 @@ export default function DashboardPage() {
       }
     };
 
-    fetchUserId();
-  }, [auth]);
+    if (authChecked) {
+      fetchUserId();
+    }
+  }, [auth, authChecked]);
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -67,8 +80,11 @@ export default function DashboardPage() {
       }
     };
 
-    fetchFiles();
-  }, [userId, auth.token]);
+    if (authChecked && userId) {
+      fetchFiles();
+    }
+  }, [authChecked, userId, auth.token]);
+
 
   const handleView = (fileId, dictionary) => {
     if (!dictionary?.content) return setError("No dictionary content available");
@@ -118,6 +134,8 @@ export default function DashboardPage() {
   const success = files.filter(f => f.status === "Success").length;
   const failed = files.filter(f => f.status === "Failed").length;
 
+  if (!authChecked) return null;
+  
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#d1e7dd", color: "#fff", padding: "2rem", fontFamily: "sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>

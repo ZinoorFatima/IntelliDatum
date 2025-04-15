@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 import { useRouter } from "next/navigation";
 
 export default function ChangePassword() {
   const [auth] = useAuth();
   const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
+  
 
   const [form, setForm] = useState({
     currentPassword: "",
@@ -27,6 +29,14 @@ export default function ChangePassword() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (!auth?.user) {
+      router.push("/"); // Redirect to home page
+    } else {
+      setAuthChecked(true); // Allow rendering if auth is valid
+    }
+  }, [auth?.user, router]);
 
   const togglePasswordVisibility = (field) => {
     setShowPassword({
@@ -80,7 +90,8 @@ export default function ChangePassword() {
       setError(data.message || "Something went wrong.");
     }
   };
-
+  if (!authChecked) return null;
+  
   return (
     <div className="d-flex flex-column min-vh-100 bg-success">
       <main className="container py-5 flex-grow-1 d-flex align-items-center justify-content-center">

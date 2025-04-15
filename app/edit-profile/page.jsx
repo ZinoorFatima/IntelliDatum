@@ -9,6 +9,15 @@ export default function EditProfile() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    if (!auth?.user) {
+      window.location.href = "/";  // Redirect to the homepage or login page if no user
+    } else {
+      setAuthChecked(true); // Allow rendering if auth is valid
+    }
+  }, [auth]);
 
   useEffect(() => {
     if (auth?.user) {
@@ -63,6 +72,9 @@ export default function EditProfile() {
       setLoading(false);
     }
   };
+
+  // 👇 Prevent rendering until auth is confirmed
+  if (!authChecked) return null;
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-success">
