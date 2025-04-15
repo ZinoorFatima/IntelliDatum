@@ -152,11 +152,15 @@ export default function ChangePassword() {
                     {showPassword[field] ? "🙈" : "👁"}
                   </span>
                 </div>
-
+              </div>
+            );
+          })} {/* 👈 This is the missing closing brace */}
+          
           <button type="submit" className="btn btn-success w-100" disabled={loading}>
             {loading ? "Changing password..." : "Change Password"}
           </button>
         </form>
+
       </div>
     </div>
   );

@@ -12,12 +12,12 @@ export default function ContactUs() {
     email: '',
     message: ''
   });
-  const [status, setStatus] = useState({ message: '', type: '' });
+  //const [status, setStatus] = useState({ message: '', type: '' });
 
   useEffect(() => {
     // This logic will only run on the client-side
     const authData = localStorage.getItem("authData");
-    setStatus({ message: '', type: '' });
+    //setStatus({ message: '', type: '' });
     if (authData) {
       console.log("Authentication data:", authData);
     } else {

@@ -10,7 +10,7 @@ const ForgotPassword = () => {
   const [emailError, setEmailError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const [status, setStatus] = useState({ message: '', type: '' });
+  //const [status, setStatus] = useState({ message: '', type: '' });
   const generateResetToken = () => {
     return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit token
   };
@@ -18,7 +18,7 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setEmailError("");
-    setStatus({ message: '', type: '' });
+    //setStatus({ message: '', type: '' });
     if (!email) {
       setEmailError("Email is required");
       return;
@@ -78,7 +78,7 @@ const ForgotPassword = () => {
           router.push("/reset-password");
         }, 1500);
       } else {
-        setStatus({ message: 'Failed to reset', type: 'Danger' });
+        //setStatus({ message: 'Failed to reset', type: 'Danger' });
         Swal.fire({
           icon: 'error',
           title: 'Oops!',

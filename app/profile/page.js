@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { useRouter } from "next/navigation";
 
-import Swal from "sweetalert2";
+//import Swal from "sweetalert2";
 
 export default function ProfilePage() {
   const [auth, setAuth] = useAuth();
