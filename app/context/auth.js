@@ -18,13 +18,24 @@ const AuthProvider = ({ children }) => {
     if (typeof window !== "undefined") {
       const data = localStorage.getItem("auth");
       console.log("local data:" , data)
-      if (data) {
-        const parsedData = JSON.parse(data);
-        setAuth({
-          user: parsedData.user,
-          token: parsedData.token,
-        });
+
+      const localData = localStorage.getItem("auth");
+
+      let parsedData = null;
+      if (localData) {
+        try {
+          console.log("Parsing localStorage auth data");
+          parsedData = JSON.parse(localData);
+          console.log("Parsed auth data:", parsedData);
+          setAuth({
+            user: parsedData.user,
+            token: parsedData.token,
+          });
+        } catch (e) {
+          console.error("Failed to parse auth data", e);
+        }
       }
+      //console.log("Parsed auth data:", parsedData);
     }
   }, []); // Run only once on mount
 

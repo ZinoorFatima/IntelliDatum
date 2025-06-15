@@ -135,12 +135,16 @@ const Page = () => {
         for (let line of lines) {
           if (line.startsWith("data: ")) {
             const data = line.replace("data: ", "").trim();
-
+            console.log("here")
             // Check for "Final result" tag
-            if (data.startsWith("Final result:base64")) {
-              const encoded = data.replace("Final result:base64:", "").trim();
+            if (data.startsWith("Final result:")) {
+
+              console.log("final result,", data)
+              const encoded = data.replace("Final result:", "").trim();
+              console.log("encoded: ", encoded)
               const decoded = atob(encoded);
               finalOutput = decoded;
+              console.log("final: ", finalOutput)
             } else {
               // Update progress display or store it if needed
               result = data;
@@ -155,6 +159,8 @@ const Page = () => {
         }
       }
 
+      console.log("outside while loop, finalOutput: ", finalOutput);
+
       // After stream finishes, set final output
       setProcessedText(finalOutput || result); // fallback to progress if no final result
       setFileDetails((prev) => ({ ...prev, status: "Completed" }));
@@ -166,9 +172,8 @@ const Page = () => {
         dbFormData.append("userId", userId);
         dbFormData.append("status", "Success"); // Set status based on processing success
 
-
-        if (externalData.content) {
-          const dictionaryBlob = new Blob([externalData.content], { type: "text/plain" });
+        if (finalOutput) {
+          const dictionaryBlob = new Blob([finalOutput], { type: "text/plain" });
           dbFormData.append("dictionary", dictionaryBlob, `${selectedFile.name}_dictionary.txt`);
         }
 
