@@ -177,19 +177,22 @@ const Page = () => {
           dbFormData.append("dictionary", dictionaryBlob, `${selectedFile.name}_dictionary.txt`);
         }
 
-        await fetch("/api/files/write-file", {
+        //console.log("Form DATA : ", dbFormData);
+
+        const dbResponse = await fetch("/api/files/write-file", {
           method: "POST",
           body: dbFormData,
         });
 
+        console.log('Db Response:', dbResponse);
 
-        if (!dbResponse.ok) {
-          throw new Error("Failed to save file to database");
+        //if (!dbResponse.ok) {
+        //  throw new Error("Failed to save file to database");
 
-        }
+        //}
 
-        const dbData = await dbResponse.json();
-        console.log("File saved to database:", dbData);
+        //const dbData = await dbResponse.json();
+        //console.log("File saved to database:", dbData);
 
 
       }
