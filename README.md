@@ -88,22 +88,33 @@ The response is a server-sent event stream: `data: Processing` while the pipelin
 
 ### Example output
 
-An illustrative dictionary for a comma-delimited, multi-document file:
+A dictionary for an orders export: a comma-separated file with quoted fields and a header row. `<doc-info>` describes how the file splits into records and fields, and `<data-layout>` lists each field's position, name and type.
 
 ```xml
-<?xml version="1.0" encoding="utf-8" ?>
-<doc-info separator="***" value="," append-existing-file="false">
-  <record-info separator="," multi-record="true" rec-id-index="0" skip-first-record="false" />
-  <field-info separator="," />
-</doc-info>
-<data-layout>
-  <record name="HDR" id="HDR">
-        <field name="Record Type" type="string" format="" index="0" />
-        <field name="Plan Code" type="string" format="" index="1" />
-        <field name="Provider Name" type="string" format="" index="2" />
-        <field name="Effective Date" type="string" format="" index="3" />
-  </record>
-</data-layout>
+<data-map name="Orders" type="Delimited" encoding="iso-8859-1" version="1.0.1">
+  <doc-info separator="CharSequence" value="\r\n">
+    <record-info multi-record="False" rec-id-length="0" rec-length="0" separator="\r\n" skip-first-record="True"/>
+    <field-info end-delimiter="&quot;" separator="," start-delimiter="&quot;"/>
+  </doc-info>
+  <data-layout>
+    <record name="OrderInfo" type="Repeat">
+      <field index="1" name="OrderID" type="String"/>
+      <field index="2" name="CustomerID" type="String"/>
+      <field index="3" name="EmployeeID" type="String"/>
+      <field index="4" name="OrderDate" type="String"/>
+      <field index="5" name="RequiredDate" type="String"/>
+      <field index="6" name="ShippedDate" type="String"/>
+      <field index="7" name="ShipVia" type="String"/>
+      <field index="8" name="Freight" type="String"/>
+      <field index="9" name="ShipName" type="String"/>
+      <field index="10" name="ShipAddress" type="String"/>
+      <field index="11" name="ShipCity" type="String"/>
+      <field index="12" name="ShipRegion" type="String"/>
+      <field index="13" name="ShipPostalCode" type="String"/>
+      <field index="14" name="ShipCountry" type="String"/>
+    </record>
+  </data-layout>
+</data-map>
 ```
 
 ## Tech stack
