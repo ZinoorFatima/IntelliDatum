@@ -31,6 +31,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,8 +40,21 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .qodo
-backend
-backend/*
 
-uploads
-uploads/*
+# python backend
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# data files: uploads, the pattern library and sample datasets are never committed
+uploads/
+Delimited/
+*.csv
+*.epf
+*.xls
+*.xlsx
+*.zip
+
+# local tools / binaries (e.g. Sysinternals handle64.exe)
+*.exe

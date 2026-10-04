@@ -1,0 +1,30 @@
+# Web server
+flask==3.1.0
+flask-cors==5.0.1
+
+# Loads API keys from backend/.env
+python-dotenv==1.1.0
+
+# Transformers & Model Inference
+transformers==4.51.1
+torch==2.6.0
+huggingface-hub==0.30.2
+accelerate==1.6.0  # required by from_pretrained(device_map=...)
+
+# LangChain
+langchain==0.3.23
+langchain-core==0.3.51
+langchain-community==0.3.21
+
+# Qdrant for vector DB
+qdrant-client==1.13.3
+
+# Nomic embeddings
+nomic==3.4.1
+
+# NLP & Math
+scikit-learn==1.6.1
+numpy==2.2.4
+
+# Other utilities (standard library - no need to include)
+# os, re, random, itertools, csv, json, io, pathlib — built-in
