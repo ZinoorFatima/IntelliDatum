@@ -252,7 +252,7 @@ const Page = () => {
           <input
             ref={inputRef}
             type="file"
-            accept=".txt,.csv"
+            accept=".txt,.csv, .xml, .xlsx, .xls"
             onChange={handleFileChange}
             style={{ display: "none" }}
           />
