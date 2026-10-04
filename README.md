@@ -45,6 +45,12 @@ This repository contains the web application and the processing service for **de
 
 ## How it works
 
+### Architecture
+
+![IntelliDatum architecture: the web app sends uploaded files to a cloud service that runs metadata extraction, content extraction, data tagging and dictionary generation, then returns the extracted dictionary; results are stored in a database](docs/architecture.png)
+
+### Components
+
 ```mermaid
 flowchart LR
     U([User]) --> FE["Next.js web app<br/>React pages + API routes"]
@@ -133,6 +139,7 @@ intellidatum/
 │   └── .env.example
 ├── components/               # Header, Footer
 ├── controllers/              # auth, file and user logic used by the API routes
+├── docs/                     # images used in this README
 ├── models/                   # Mongoose schemas: User, File, reset_token
 ├── helpers/                  # password hashing, email template
 ├── Middlewares/              # JWT and admin checks
