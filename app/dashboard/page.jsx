@@ -25,7 +25,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const user = auth?.user;
   const [files, setFiles] = useState([]);
-  const [userId, setUserId] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -42,60 +41,20 @@ export default function DashboardPage() {
     }, [router, setAuth]);
 
   useEffect(() => {
-    const fetchUserId = async () => {
-      if (!auth.user) return;
-
-      try {
-        const response = await fetch(
-          `/api/auth/get-user-id?email=${auth.user.email}`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${auth.token}` },
-          }
-        );
-
-        const data = await response.json();
-
-        if (data.success) {
-          setUserId(data.userId);
-        } else {
-          setError(data.message || "Error fetching user ID");
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops!',
-            text: error || 'Something went wrong.',
-            confirmButtonColor: '#d33',
-          });
-        }
-
-
-      } catch (err) {
-        console.log("Failed to fetch user ID", err);
-      }
-    };
-
-    if (authChecked) {
-      fetchUserId();
-    }
-  }, [auth, authChecked]);
-
-  useEffect(() => {
     const fetchFiles = async () => {
 
       if(user){
         setLoadingUser(false);
       }
-      if (!userId) return;
+      if (!auth.token) return;
       setIsLoading(true);
 
       try {
-        const response = await fetch(
-          `/api/files/read-file?userId=${userId}`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${auth.token}` },
-          }
-        );
+        // the server takes the user from the token
+        const response = await fetch("/api/files/read-file", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${auth.token}` },
+        });
 
         const data = await response.json();
         if (data.success) {
@@ -119,14 +78,12 @@ export default function DashboardPage() {
             text: data.message || 'Something went wrong.',
             confirmButtonColor: '#d33',
           });
-          setError(data.message || "Error fetching files");
         }
       } catch (err) {
-        setError("Failed to fetch files");
         Swal.fire({
           icon: 'error',
           title: 'Oops!',
-          text: data.message || 'Something went wrong.',
+          text: 'Failed to fetch files.',
           confirmButtonColor: '#d33',
         });
         console.error(err);
@@ -136,10 +93,10 @@ export default function DashboardPage() {
       }
     };
 
-    if (authChecked && userId) {
+    if (authChecked) {
       fetchFiles();
     }
-  }, [user, authChecked, userId, auth.token]);
+  }, [user, authChecked, auth.token]);
 
   const handleView = (fileId, dictionary) => {
 

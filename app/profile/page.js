@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
+import { useProfilePicture } from "../lib/useProfilePicture";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -13,7 +14,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const user = auth?.user;
   const [loading, setLoading] = useState(true);
-  const [profileImage, setProfileImage] = useState("/default-profile.jpg");
+  const [profileImage, handleImageError] = useProfilePicture(auth);
 
   useEffect(() => {
     const storedAuth = localStorage.getItem("auth");
@@ -27,14 +28,9 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (user) {
-      setProfileImage(`/api/user/profile-picture?email=${user.email}`);
       setLoading(false);
     }
   }, [user]);
-
-  const handleImageError = () => {
-    setProfileImage("/default-profile.jpg");
-  };
 
   if (loading) return null;
 

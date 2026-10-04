@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../lib/db";
-import fileModel from "../../../../models/fileModel"; 
-import { verifyToken } from "../../../lib/verifyToken"; 
+import { getUserIdFromRequest, unauthorizedResponse } from "../../../lib/verifyToken";
+import { findUserFile } from "../../../../controllers/fileController";
 
 export async function GET(req) {
   try {
@@ -12,20 +12,11 @@ export async function GET(req) {
       return NextResponse.json({ success: false, message: "Missing fileId" }, { status: 400 });
     }
 
-    const authHeader = req.headers.get("authorization");
-    const token = authHeader?.split(" ")[1];
-
-    if (!token) {
-      return NextResponse.json({ success: false, message: "Unauthorized: No token provided" }, { status: 401 });
-    }
-
-    const decoded = await verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json({ success: false, message: "Unauthorized: Invalid token" }, { status: 401 });
-    }
+    const userId = await getUserIdFromRequest(req);
+    if (!userId) return unauthorizedResponse();
 
     await connectDB();
-    const file = await fileModel.findById(fileId);
+    const file = await findUserFile(fileId, userId);
 
     if (!file) {
       return NextResponse.json({ success: false, message: "File not found" }, { status: 404 });

@@ -34,6 +34,13 @@ const usersSchema = new mongoose.Schema({
   },
 }, {
   timestamps: true,
+  // Never serialize the password hash, even if a whole user document ends up in a response
+  toJSON: {
+    transform: (doc, ret) => {
+      delete ret.password;
+      return ret;
+    },
+  },
 });
 
 const User = mongoose.models.User || mongoose.model("User", usersSchema);

@@ -824,4 +824,10 @@ def process():
     return jsonify({'error': 'No file part'}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    # Local-only with the debugger off unless backend/.env says otherwise.
+    # Never enable FLASK_DEBUG where others can reach the server: the debugger can run code.
+    app.run(
+        host=os.getenv('FLASK_HOST', '127.0.0.1'),
+        port=int(os.getenv('FLASK_PORT', '5000')),
+        debug=os.getenv('FLASK_DEBUG', 'false').lower() in ('1', 'true', 'yes'),
+    )

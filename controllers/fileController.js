@@ -1,19 +1,19 @@
 // controllers/fileController.js
-import fs from "fs";
-import path from "path";
+import mongoose from "mongoose";
 import  fileModel  from "../models/fileModel";  // Import the file model
 
+// Finds a file only if it belongs to the given user (null for malformed ids)
+export const findUserFile = (fileId, userId, projection) => {
+    if (!mongoose.isObjectIdOrHexString(fileId)) return null;
+    return fileModel.findOne({ _id: fileId, userId }, projection);
+};
 
-export const writeFileController = async (req) => {
+export const writeFileController = async (req, userId) => {
     try {
         const formData = await req.formData();
 
-        const userId = formData.get("userId");
         const status = formData.get("status");
 
-        if (!userId) {
-            return new Response(JSON.stringify({ message: "User ID is required" }), { status: 400 });
-        }
         if (!status) {
             return new Response(JSON.stringify({ message: "Status is required" }), { status: 400 });
         }
@@ -73,29 +73,10 @@ export const writeFileController = async (req) => {
     }
 };
 
-export const readFilesController = async (req) => {
+export const readFilesController = async (req, userId) => {
     try {
-        const { searchParams } = new URL(req.url);
-        const userId = searchParams.get("userId");
-
-        console.log("userId from query:", userId);
-
-        if (!userId) {
-            return new Response(
-                JSON.stringify({ message: "User ID is required" }),
-                { status: 400, headers: { "Content-Type": "application/json" } }
-            );
-        }
-
-        // Fetch fileName, status, and dictionary fields for the matching user
+        // Fetch fileName, status, and dictionary fields for the signed-in user (an empty list is fine)
         const files = await fileModel.find({ userId }).select("fileName status dictionaryName dictionaryFile");
-
-        if (!files || files.length === 0) {
-            return new Response(
-                JSON.stringify({ message: `No files found for userId: ${userId}` }),
-                { status: 404, headers: { "Content-Type": "application/json" } }
-            );
-        }
 
         return new Response(
             JSON.stringify({
@@ -118,7 +99,7 @@ export const readFilesController = async (req) => {
     }
 };
 
-export const updateDictionaryController = async (request) => {
+export const updateDictionaryController = async (request, userId) => {
     try {
       console.log("Update Dictionary API called");
   
@@ -132,8 +113,8 @@ export const updateDictionaryController = async (request) => {
         );
       }
   
-      const file = await fileModel.findById(fileId);
-  
+      const file = await findUserFile(fileId, userId);
+
       if (!file) {
         return new Response(
           JSON.stringify({ success: false, message: "File not found" }),

@@ -76,7 +76,7 @@ export default function ResetPasswordPage() {
       Swal.fire({
         icon: 'error',
         title: 'Oops!',
-        text: data.message || 'Something went wrong.',
+        text: 'Something went wrong.',
         confirmButtonColor: '#d33',
       });
     } finally {
@@ -128,7 +128,9 @@ export default function ResetPasswordPage() {
           <input
             type="text"
             name="token"
-            placeholder="Enter reset token"
+            placeholder="Enter the 6-digit code from your email"
+            inputMode="numeric"
+            autoComplete="one-time-code"
             className="form-control mb-3"
             value={formData.token}
             onChange={handleChange}

@@ -2,24 +2,18 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "../app/context/auth";
+import { useProfilePicture } from "../app/lib/useProfilePicture";
 import '../app/globals.css';
 const Header = () => {
   const [auth, setAuth] = useAuth();
-  const [profileImage, setProfileImage] = useState("/default-profile.jpg"); // default initially
+  // fetched with the JWT; falls back to the default picture
+  const [profileImage, handleImageError] = useProfilePicture(auth);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap.bundle.min.js");
-
-    if (auth?.user?.email) {
-      setProfileImage(`/api/user/profile-picture?email=${auth.user.email}`);
-    }
-  }, [auth]);
-
-  const handleImageError = () => {
-    setProfileImage("/default-profile.jpg"); // fallback if fetch fails
-  };
+  }, []);
 
   const handleLogout = () => {
     setAuth({ user: null, token: "" });

@@ -46,12 +46,13 @@ useEffect(() => {
     const formData = new FormData();
     formData.append("FirstName", form.FirstName);
     formData.append("LastName", form.LastName);
-    formData.append("email", auth.user.email);
     if (file) formData.append("profilePicture", file);
 
     try {
+      // the server takes the user from the token
       const res = await fetch("/api/auth/update-profile", {
         method: "POST",
+        headers: { Authorization: `Bearer ${auth.token}` },
         body: formData,
       });
 
@@ -63,7 +64,6 @@ useEffect(() => {
           ...auth.user,
           FirstName: data.user.FirstName,
           LastName: data.user.LastName,
-          profilePicture: data.user.profilePicture,
         };
 
         setAuth({ ...auth, user: updatedUser });

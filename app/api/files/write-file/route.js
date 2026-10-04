@@ -1,5 +1,6 @@
 import { writeFileController } from "../../../../controllers/fileController";
  import { connectDB } from "../../../lib/db";
+ import { getUserIdFromRequest, unauthorizedResponse } from "../../../lib/verifyToken";
  import multer from 'multer'; // For handling file uploads
  
  // Set up multer for file upload
@@ -8,6 +9,9 @@ import { writeFileController } from "../../../../controllers/fileController";
  
  export async function POST(req) {
      try {
+         const userId = await getUserIdFromRequest(req);
+         if (!userId) return unauthorizedResponse();
+
          // Initialize file upload middleware
          await new Promise((resolve, reject) => {
              upload.single('file')(req, {}, (err) => {
@@ -19,7 +23,7 @@ import { writeFileController } from "../../../../controllers/fileController";
          });
  
          await connectDB();
-         return writeFileController(req);
+         return writeFileController(req, userId);
      } catch (error) {
          console.error("File upload error from API:", error);
          return new Response(

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useAuth } from "../context/auth";
 import Swal from "sweetalert2";
 import { CloudArrowUpIcon } from "@heroicons/react/24/solid";
@@ -14,35 +14,8 @@ const Page = () => {
   const [processedText, setProcessedText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [userId, setUserId] = useState(null);
   const [isDragActive, setIsDragActive] = useState(false);
   const inputRef = useRef();
-
-  useEffect(() => {
-    const fetchUserId = async () => {
-      if (!auth?.user) return;
-      try {
-        const response = await fetch(`/api/auth/get-user-id?email=${auth.user.email}`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${auth.token}` },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch user ID");
-        const data = await response.json();
-        setUserId(data.userId);
-      } catch (err) {
-        console.error("Failed to fetch user ID:", err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops!',
-          text: 'Failed to fetch user ID' || 'Something went wrong.',
-          confirmButtonColor: '#d33',
-        });
-      }
-    };
-
-    fetchUserId();
-  }, [auth]);
 
   const handleFile = (file) => {
     if (!file.name.match(/\.(txt|csv)$/i)) {
@@ -163,14 +136,14 @@ const Page = () => {
 
       // After stream finishes, set final output
       setProcessedText(finalOutput || result); // fallback to progress if no final result
-      setFileDetails((prev) => ({ ...prev, status: "Completed" }));
+      // "Processed" is what the status colour and the Download button check for
+      setFileDetails((prev) => ({ ...prev, status: finalOutput ? "Processed" : "Failed" }));
 
 
-      if (userId) {
+      if (auth?.token) {
         const dbFormData = new FormData();
         dbFormData.append("file", selectedFile);
-        dbFormData.append("userId", userId);
-        dbFormData.append("status", "Success"); // Set status based on processing success
+        dbFormData.append("status", finalOutput ? "Success" : "Failed"); // Set status based on processing success
 
         if (finalOutput) {
           const dictionaryBlob = new Blob([finalOutput], { type: "text/plain" });
@@ -181,6 +154,7 @@ const Page = () => {
 
         const dbResponse = await fetch("/api/files/write-file", {
           method: "POST",
+          headers: { Authorization: `Bearer ${auth.token}` },
           body: dbFormData,
         });
 
@@ -207,11 +181,10 @@ const Page = () => {
       });
       setFileDetails((prev) => ({ ...prev, status: "Failed" }));
 
-      if (userId) {
+      if (auth?.token) {
         try {
           const dbFormData = new FormData();
           dbFormData.append("file", selectedFile);
-          dbFormData.append("userId", userId);
           dbFormData.append("status", "Failed");
           const dictionaryBlob = new Blob([""], { type: "text/plain" });
           dbFormData.append("dictionary", dictionaryBlob, "");
@@ -224,6 +197,7 @@ const Page = () => {
 
           await fetch("/api/files/write-file", {
             method: "POST",
+            headers: { Authorization: `Bearer ${auth.token}` },
             body: dbFormData,
           });
         } catch (dbError) {
@@ -242,11 +216,13 @@ const Page = () => {
   };
 
   const handleDownload = () => {
-    const blob = new Blob([processedText], { type: "text/plain" });
+    // same naming as the dashboard: dictionaries are XML
+    const isXml = processedText.trim().startsWith("<");
+    const blob = new Blob([processedText], { type: isXml ? "application/xml" : "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `processed_${fileDetails.name}`;
+    link.download = `${fileDetails.name}_dictionary.${isXml ? "xml" : "txt"}`;
     document.body.appendChild(link);
     link.click();
     setTimeout(() => {

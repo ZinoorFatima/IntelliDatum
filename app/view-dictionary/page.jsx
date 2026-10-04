@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Download } from "lucide-react";
+import { useAuth } from "../context/auth";
 
 export default function ViewDictionaryPage() {
   const router = useRouter();
+  const [auth] = useAuth();
 
   const [fileId, setFileId] = useState(null);
   const [dictionary, setDictionary] = useState(null);
@@ -13,16 +15,22 @@ export default function ViewDictionaryPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!localStorage.getItem("auth")) {
+      router.push("/");
+      return;
+    }
     const params = new URLSearchParams(window.location.search);
     const id = params.get("fileId");
     setFileId(id);
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const fetchDictionary = async () => {
-      if (!fileId) return;
+      if (!fileId || !auth?.token) return;
       try {
-        const response = await fetch(`/api/files/get-dictionary?fileId=${fileId}`);
+        const response = await fetch(`/api/files/get-dictionary?fileId=${fileId}`, {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        });
         const data = await response.json();
         if (data.success) {
           setDictionary(data.dictionary);
@@ -38,7 +46,7 @@ export default function ViewDictionaryPage() {
     };
 
     fetchDictionary();
-  }, [fileId]);
+  }, [fileId, auth?.token]);
 
   const handleDownload = () => {
     if (!dictionary?.content) {

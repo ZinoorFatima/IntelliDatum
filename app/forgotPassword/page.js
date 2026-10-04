@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import toast from "react-hot-toast";
-import emailjs from "emailjs-com";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 const ForgotPassword = () => {
@@ -11,9 +9,6 @@ const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   //const [status, setStatus] = useState({ message: '', type: '' });
-  const generateResetToken = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit token
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,61 +26,35 @@ const ForgotPassword = () => {
     }
 
     setIsLoading(true);
-    const token = generateResetToken();
 
     try {
-      const saveRes = await fetch("/api/auth/create-reset-token", {
+      // The server creates the code and emails it; its reply is the same whether or not the account exists
+      const res = await fetch("/api/auth/create-reset-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, token }),
+        body: JSON.stringify({ email }),
       });
 
-      const saveData = await saveRes.json();
-      if (!saveRes.ok || !saveData.success) {
+      const data = await res.json();
+      if (!res.ok || !data.success) {
         Swal.fire({
           icon: 'error',
           title: 'Oops!',
-          text: 'Failed to send message' || 'Something went wrong.',
+          text: data.message || 'Something went wrong.',
           confirmButtonColor: '#d33',
         });
         return;
       }
 
-      const randomPassword = token;
-      const templateParams = {
-        user_email: email,  // The email to which you are sending the password
-        random_password: randomPassword,  // This will be sent in the email
-        user_name: email.split('@')[0],  // You can use the part of the email before "@" as the name
-      };
-
-
-      const emailRes = await emailjs.send(
-        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
-        process.env.NEXT_PUBLIC_EMAILJS_RESET_TEMPLATE_ID, // create this template in EmailJS
-        templateParams,
-        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
-      );
-
-      if (emailRes.status === 200) {
-        toast.success("Token sent to your email.");
-        Swal.fire({
-          icon: 'success',
-          text: 'Check your email for token.' || 'Reset Token Sent!',
-          confirmButtonColor: '#198754',
-        });
-        setEmail("");
-        setTimeout(() => {
-          router.push("/reset-password");
-        }, 1500);
-      } else {
-        //setStatus({ message: 'Failed to reset', type: 'Danger' });
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops!',
-          text: 'Failed to reset' || 'Something went wrong.',
-          confirmButtonColor: '#d33',
-        });
-      }
+      Swal.fire({
+        icon: 'success',
+        text: data.message,
+        confirmButtonColor: '#198754',
+      });
+      setEmail("");
+      setTimeout(() => {
+        router.push("/reset-password");
+      }, 1500);
     } catch (err) {
       console.error(err);
       Swal.fire({
@@ -159,7 +128,7 @@ const ForgotPassword = () => {
               ></span>
             </>
           ) : (
-            "Send Reset Token"
+            "Send Reset Code"
           )}
         </button>
       </div>

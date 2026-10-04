@@ -40,7 +40,7 @@ This repository contains the web application and the processing service for **de
 - **Dictionary generation**: produces an EPF/XML data dictionary with document, record and field definitions.
 - **Dictionary editor**: rename fields while the matching column is highlighted in the original file.
 - **Dashboard**: shows total, successful and failed files, and lets you view, edit, download or delete each result.
-- **User accounts**: sign up and sign in with JWT authentication, profile picture, change password, and a forgot-password flow with an emailed reset token.
+- **User accounts**: sign up and sign in with JWT authentication, profile picture and change password. Forgot-password emails a one-time 6-digit code that is generated and hashed on the server, expires after 15 minutes and locks after 5 wrong attempts.
 - **Contact form** powered by EmailJS.
 
 ## How it works
@@ -61,7 +61,8 @@ flowchart LR
     BE <-->|store + compare vectors| QD[("Qdrant")]
     BE -->|prompts| LL["Llama-2-7B-chat<br/>Hugging Face Transformers"]
     BE -->|find closest layout| PL[["Pattern library<br/>backend/Delimited/"]]
-    FE -.->|contact + reset emails| EJ["EmailJS"]
+    FE -.->|contact form| EJ["EmailJS"]
+    FE -.->|password-reset codes| GM["Gmail SMTP<br/>via Nodemailer"]
 ```
 
 1. On the **Upload File** page the browser sends the file to the processing service (`POST /process`) and shows streamed status updates.
@@ -113,7 +114,7 @@ An illustrative dictionary for a comma-delimited, multi-document file:
 | Web API | Next.js API routes (Node.js), MongoDB with Mongoose 8, JSON Web Tokens, bcrypt |
 | Processing service | Python, Flask 3, Flask-CORS |
 | AI / ML | Llama-2-7B-chat via Hugging Face Transformers and PyTorch, LangChain, Nomic embeddings, Qdrant vector database, scikit-learn, NumPy |
-| Email | EmailJS (contact form and password-reset token) |
+| Email | Nodemailer with Gmail (password-reset codes), EmailJS (contact form) |
 
 ## Project structure
 
@@ -158,7 +159,8 @@ intellidatum/
 - **Qdrant**, either a [Qdrant Cloud](https://cloud.qdrant.io) cluster or a local instance (`docker run -p 6333:6333 qdrant/qdrant`)
 - A **Nomic API key** from [atlas.nomic.ai](https://atlas.nomic.ai)
 - A **Hugging Face access token**, with access granted to [`meta-llama/Llama-2-7b-chat-hf`](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf) (request access on the model page)
-- An **EmailJS** account, optional, for the contact form and password-reset emails
+- A **Gmail account with an [App Password](https://support.google.com/accounts/answer/185833)**, used to email password-reset codes
+- An **EmailJS** account, optional, for the contact form
 
 > **Hardware:** the backend loads Llama-2-7B on the CPU in full precision. Plan for roughly **28 GB of free RAM** and about **13 GB of disk** for the model download. Processing a file can take several minutes.
 
@@ -186,7 +188,7 @@ Add the [pattern library](#pattern-library) at `backend/Delimited/`, then start 
 python backendapi.py          # serves http://localhost:5000
 ```
 
-The model is downloaded from Hugging Face the first time a file is processed.
+By default the service only listens on `127.0.0.1` and Flask's debugger is off; see `FLASK_HOST`, `FLASK_PORT` and `FLASK_DEBUG` under [Configuration](#processing-service-backendenv). The model is downloaded from Hugging Face the first time a file is processed.
 
 ### 3. Start the web app
 
@@ -194,7 +196,7 @@ In a second terminal, from the repository root:
 
 ```bash
 npm install
-cp .env.example .env          # then fill in MongoDB, JWT secret, backend URL and EmailJS ids
+cp .env.example .env          # then fill in MongoDB, JWT secret, backend URL, Gmail sender and EmailJS ids
 npm run dev
 ```
 
@@ -235,7 +237,7 @@ The library used during the project was built from confidential client data, so 
 3. **Upload a file.** Open **Files** (or **Upload File** on the dashboard), drag and drop a `.txt` or `.csv` file or click to choose one, then press **Process**. The status updates while the backend works, and the generated dictionary appears in the **Preview** box.
 4. **Review results on the dashboard.** You see totals for all, successful and failed files. For each file you can **view**, **edit**, **download** (`.xml`) or **delete** the dictionary. Failed files cannot be opened.
 5. **Edit a dictionary.** In the editor, click into a field to highlight the matching column in the original file content, rename it, then **Save**.
-6. **Manage your account.** From **Profile** you can edit your name and profile picture, or change your password. If you forget your password, use **Forgot Password**: a 6-digit token (valid for 15 minutes) is emailed to you, and you enter it on the **Reset Password** page.
+6. **Manage your account.** From **Profile** you can edit your name and profile picture, or change your password. If you forget your password, use **Forgot Password**: a 6-digit code is emailed to you, and you enter it on the **Reset Password** page. The code works once, expires after 15 minutes and locks after 5 wrong attempts; after a lock, wait 15 minutes and request a new code.
 7. **Contact Us** sends a message to the team through EmailJS.
 
 ## Configuration
@@ -249,12 +251,13 @@ All secrets live in `.env` files that git ignores. Copy each `.env.example` and 
 | `MONGODB_URI` | Yes | MongoDB connection string. Also needed at build time. |
 | `JWT_SECRET` | Yes | Secret used to sign login tokens. |
 | `BACKEND_API` | Yes | Base URL of the processing service, without a trailing slash, e.g. `http://localhost:5000`. |
-| `NEXT_PUBLIC_EMAILJS_SERVICE_ID` | For emails | EmailJS service ID. |
-| `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | For emails | EmailJS public key. |
+| `EMAIL_ID` | For password reset | Gmail address that sends the reset codes. |
+| `EMAIL_PASSWORD` | For password reset | A Google App Password for that account (not the normal password). |
+| `NEXT_PUBLIC_EMAILJS_SERVICE_ID` | For the contact form | EmailJS service ID. |
+| `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | For the contact form | EmailJS public key. |
 | `NEXT_PUBLIC_EMAILJS_CONTACT_TEMPLATE_ID` | For the contact form | Template that receives `name`, `email` and `message`. |
-| `NEXT_PUBLIC_EMAILJS_RESET_TEMPLATE_ID` | For password reset | Template that receives `user_email`, `user_name` and `random_password` (the reset token). |
 
-These values are inlined when the app is built, so restart `npm run dev` or rebuild after changing them.
+Next.js reads these at startup and inlines some of them at build time, so restart `npm run dev` or rebuild after changing them.
 
 ### Processing service (`backend/.env`)
 
@@ -264,6 +267,9 @@ These values are inlined when the app is built, so restart `npm run dev` or rebu
 | `QDRANT_API_KEY` | Qdrant Cloud only | API key for the cluster. |
 | `NOMIC_API_KEY` | Yes | Nomic key for `nomic-embed-text-v1` embeddings. |
 | `HF_TOKEN` | Yes | Hugging Face token with access to `meta-llama/Llama-2-7b-chat-hf`. |
+| `FLASK_HOST` | No | Address to listen on. Defaults to `127.0.0.1` (this machine only). |
+| `FLASK_PORT` | No | Port to listen on. Defaults to `5000`; keep `BACKEND_API` in sync. |
+| `FLASK_DEBUG` | No | `true` turns on Flask's debugger. Defaults to `false`; never enable it on a reachable machine, because the debugger can run code. |
 
 ## API reference
 
@@ -275,22 +281,23 @@ These values are inlined when the app is built, so restart `npm run dev` or rebu
 
 ### Web app API routes
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/auth/register` | Create an account. |
-| `POST` | `/api/auth/login` | Sign in; returns a JWT (valid for 7 days) and the user profile. |
-| `GET` | `/api/auth/get-user-id?email=` | Look up a user's ID. |
-| `POST` | `/api/auth/create-reset-token` | Store a password-reset token (expires in 15 minutes). |
-| `POST` | `/api/auth/reset-password` | Reset a password with email, token and new password. |
-| `POST` | `/api/auth/change-password` | Change a password given the current one. |
-| `POST` | `/api/auth/update-profile` | Update name and profile picture (multipart). |
-| `GET` | `/api/user/profile-picture?email=` | Get a user's profile picture. |
-| `POST` | `/api/files/write-file` | Save an uploaded file with its status and generated dictionary (multipart, up to 10 MB). |
-| `GET` | `/api/files/read-file?userId=` | List a user's files and dictionaries. |
-| `GET` | `/api/files/read-file-by-id?fileId=` | Get one file and its content (requires `Authorization: Bearer <token>`). |
-| `GET` | `/api/files/get-dictionary?fileId=` | Get a file's dictionary. |
-| `PUT` | `/api/files/update-dictionary` | Save an edited dictionary (`{ fileId, content }`). |
-| `DELETE` | `/api/files/delete-file?fileId=` | Delete a file and its dictionary. |
+Routes marked **JWT** need an `Authorization: Bearer <token>` header, using the token from `/api/auth/login`. They only act on the signed-in user: the user ID comes from the token, and a file that belongs to someone else returns 404.
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/auth/register` | – | Create an account. |
+| `POST` | `/api/auth/login` | – | Sign in; returns a JWT (valid for 7 days) and the user profile. |
+| `POST` | `/api/auth/create-reset-token` | – | Email a one-time 6-digit reset code (`{ email }`). The response is the same whether or not the account exists. |
+| `POST` | `/api/auth/reset-password` | – | Reset a password with `{ email, token, password }`, where `token` is the emailed code. |
+| `POST` | `/api/auth/change-password` | JWT | Change your password given the current one. |
+| `POST` | `/api/auth/update-profile` | JWT | Update your name and profile picture (multipart). |
+| `GET` | `/api/user/profile-picture` | JWT | Get your profile picture. |
+| `POST` | `/api/files/write-file` | JWT | Save an uploaded file with its status and generated dictionary (multipart, up to 10 MB). |
+| `GET` | `/api/files/read-file` | JWT | List your files and dictionaries. |
+| `GET` | `/api/files/read-file-by-id?fileId=` | JWT | Get one of your files and its content. |
+| `GET` | `/api/files/get-dictionary?fileId=` | JWT | Get a file's dictionary. |
+| `PUT` | `/api/files/update-dictionary` | JWT | Save an edited dictionary (`{ fileId, content }`). |
+| `DELETE` | `/api/files/delete-file?fileId=` | JWT | Delete a file and its dictionary. |
 
 ## Notes and limitations
 
@@ -298,7 +305,7 @@ These values are inlined when the app is built, so restart `npm run dev` or rebu
 - **One layout per dictionary:** the generated dictionary describes a single record layout, the last record group found in the file.
 - **Performance:** Llama-2 is loaded on the CPU, in full precision, for every request, so processing is slow and memory-hungry. A GPU or a quantized model would speed it up considerably.
 - **One file at a time:** the Qdrant collection is cleared at the start of every request, so the service should process one file at a time.
-- **Academic prototype:** the app is not production-hardened. For example, several API routes do not verify the JWT, and the password-reset flow needs server-side hardening. Review authentication and authorization before any public deployment.
+- **Academic prototype:** the app is not production-hardened. The processing service has no authentication of its own (keep it on `127.0.0.1` or behind the web app), there is no rate limiting on sign-in or reset requests, and the JWT is kept in `localStorage`. Update dependencies, including Next.js, to their latest patched versions before any public deployment.
 
 ## Data and privacy
 

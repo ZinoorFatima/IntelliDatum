@@ -78,11 +78,14 @@ export default function ChangePassword() {
       return;
     }
 
+    // the server takes the user from the token
     const res = await fetch("/api/auth/change-password", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${auth?.token}`,
+      },
       body: JSON.stringify({
-        email: auth?.user?.email,
         currentPassword: form.currentPassword,
         newPassword: form.newPassword,
       }),
